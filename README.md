@@ -6,6 +6,7 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 |---|---|
 | [`audit`](skills/audit/SKILL.md) | Audits changes for security, performance, resilience, accessibility, legal, consistency, personas, and more |
 | [`loop-audit`](skills/loop-audit/SKILL.md) | Runs `audit`, fixes what it finds, and repeats until only rare low-priority edge cases remain |
+| [`release`](skills/release/SKILL.md) | Commits, opens a PR, waits for CI and reviews, fixes what comes back, merges, and runs the project's release process |
 
 ## Set up a machine
 
