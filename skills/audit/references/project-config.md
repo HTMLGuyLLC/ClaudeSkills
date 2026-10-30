@@ -5,10 +5,6 @@
 ```markdown
 # Audit config
 
-## Personas
-- Solo freelancer on the free plan, tracks one client
-- Agency owner with 20 seats, needs client-level reports
-
 ## Plans
 Free, Pro ($12/mo), Business ($49/seat)
 
@@ -28,3 +24,5 @@ US and EU customers
 ```
 
 Read this file from the base branch when there is one, and pass it to the review agents. Skipped lenses still appear in the report as N/A with the stated reason. A known exception means the matching finding is dropped, and the report lists what was dropped.
+
+Personas belong in `.claude/personas.md`, which the `personas` skill manages. A `## Personas` section here still counts, and that skill will find it on its first run.

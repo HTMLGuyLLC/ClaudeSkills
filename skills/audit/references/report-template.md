@@ -38,6 +38,9 @@
 - **Worked:**
 - **Stuck on:** (link finding ids)
 
+## Suggested personas
+- **<Persona>:** not saved yet, or the evidence that nobody on the list covers them.
+
 ## Ideas
 - **<Idea>:** benefit, effort, running cost.
 

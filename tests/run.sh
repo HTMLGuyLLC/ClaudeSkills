@@ -7,6 +7,7 @@ repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 pr_state="$repo/skills/release/scripts/pr-state.sh"
 scope="$repo/skills/audit/scripts/scope.sh"
 scanners="$repo/skills/audit/scripts/scanners.sh"
+find_personas="$repo/skills/personas/scripts/find.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 failures=0
@@ -186,6 +187,49 @@ out=$(cd "$s" && touch package.json && mkdir -p node_modules/.bin &&
 expect "project code skipped" "skipped  knip (--no-project-code)" "$out"
 [ ! -e "$work/ran" ] && pass || fail "--no-project-code ran a project binary"
 
+# --- personas: find what a project already says
+p=$(new_repo)
+out=$(cd "$p" && bash "$find_personas" 2>&1); code=$?
+expect "no personas" "saved: no" "$out"
+[ "$code" = 0 ] && pass || fail "no personas should exit 0"
+mkdir -p "$p/docs/deep" "$p/.claude/audits" "$p/.claude/agents" "$p/node_modules/x"
+printf '# Rules\n\n## Personas\n- Agency owner\n' > "$p/AGENTS.md"
+printf 'Our target customers are florists.\n' > "$p/docs/deep/who.md"
+printf 'We never store personal data.\n' > "$p/privacy.md"
+printf 'persona in the app code\n' > "$p/app.ts"
+printf 'Personas walked through\n' > "$p/.claude/audits/old.md"
+printf 'Added user roles\n' > "$p/CHANGELOG.md"
+printf 'persona\n' > "$p/node_modules/x/README.md"
+printf 'node_modules/\n' > "$p/.gitignore"
+printf 'agent\n' > "$p/.claude/agents/tester.md"
+out=$(cd "$p/docs" && bash "$find_personas" 2>&1)
+expect "finds AGENTS.md section" "AGENTS.md:3:## Personas" "$out"
+expect "finds other wording, from a subfolder" "docs/deep/who.md:1:" "$out"
+expect "lists agents" "agent: .claude/agents/tester.md" "$out"
+reject "personal isn't persona" "privacy.md" "$out"
+reject "only docs" "app.ts" "$out"
+reject "skips old reports" ".claude/audits" "$out"
+reject "skips changelog" "CHANGELOG" "$out"
+reject "skips ignored files" "node_modules" "$out"
+printf '# Personas\n\nLast reviewed: 2026-01-02\nAlso defined in: AGENTS.md, docs/users.md\n' > "$p/.claude/personas.md"
+out=$(cd "$p" && bash "$find_personas" 2>&1)
+expect "saved list" "saved: yes" "$out"
+expect "review date" "last_reviewed: 2026-01-02" "$out"
+expect "other homes" "also_defined_in: AGENTS.md, docs/users.md" "$out"
+reject "saved list isn't a match" ".claude/personas.md:" "$out"
+printf '# Personas\n' > "$p/.claude/personas.md"
+out=$(cd "$p" && bash "$find_personas" 2>&1)
+reject "never reviewed" "last_reviewed: 2" "$out"
+out=$(cd "$p" && PERSONA_MAX_MATCHES=1 bash "$find_personas" 2>&1)
+expect "cut-off is reported" "stopped at 1 matches" "$out"
+plain_dir="$work/not-git"
+mkdir -p "$plain_dir/node_modules"
+printf '## Personas\n' > "$plain_dir/notes.md"
+printf 'persona\n' > "$plain_dir/node_modules/a.md"
+out=$(cd "$plain_dir" && bash "$find_personas" 2>&1)
+expect "works outside git" "notes.md:1:" "$out"
+reject "skips dependencies outside git" "node_modules" "$out"
+
 # --- install
 home="$work/home"
 mkdir -p "$home/.claude/skills"
@@ -215,6 +259,7 @@ done
 for skill in release loop-audit improve-deterministic; do
   grep -q '^disable-model-invocation: true$' "$repo/skills/$skill/SKILL.md" && pass || fail "$skill: must be typed to run"
 done
+grep -q '^disable-model-invocation:' "$repo/skills/personas/SKILL.md" && fail "personas: audit must be able to invoke it" || pass
 
 # --- Audit bundles cover every lens exactly once, and never reuse a lens id
 audit_skill="$repo/skills/audit/SKILL.md"
