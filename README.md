@@ -59,6 +59,14 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 
 This checks what catches the eye, whether the main buttons push people toward the key actions, light and dark mode, and mobile at every screen size. It also covers layout, loading and error states, and first-time use. It needs a running app or screenshots to judge how things look.
 
+**Check that what you promise is still true:**
+
+```text
+/audit legal
+```
+
+This compares your privacy policy and terms with what the product really does. It also checks every claim on your site and in your app, like "cancel anytime" or "99.9% uptime", and marks each one True, False, Stale, or Unproven. It always asks before rewording legal pages or claims, even with `--fix`.
+
 **Check a group of topics:**
 
 ```text
@@ -70,7 +78,7 @@ The groups are `protect`, `reliability`, `observability`, `engineering`, `experi
 **Options:**
 
 - `--quick` looks only for serious problems, and costs less.
-- `--fix` also fixes the Critical, High, and Medium problems it finds.
+- `--fix` also fixes the Critical, High, and Medium problems it finds, except legal pages and claims.
 
 ```text
 /audit pr 123 --quick

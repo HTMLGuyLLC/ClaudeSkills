@@ -30,6 +30,12 @@
 ## Low
 (same format; Low may be one line each)
 
+## Claims checked
+
+| Claim | Where | Result | Evidence |
+|---|---|---|---|
+(one row per claim or policy statement checked by `legal`: True, False, Stale, or Unproven, with the finding id if there is one)
+
 ## Persona walkthroughs
 
 ### <Persona>

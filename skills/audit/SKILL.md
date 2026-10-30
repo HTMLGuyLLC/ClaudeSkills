@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance, resilience, error handling, logging, alerting, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, legal, docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
+description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance, resilience, error handling, logging, alerting, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, legal (including whether the privacy policy, terms, and public claims are still true), docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
 argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens or bundle,...] [--quick] [--fix]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scope.sh *)
@@ -29,7 +29,7 @@ Check a set of changes against every lens in the table below, then report only v
 | Group | Lens id | Covers | Checklist |
 |---|---|---|---|
 | 1 | `security` | Permissions, login, sessions (extra attention), credential handling, OWASP, PCI, dependencies on latest versions, abuse | `references/1-security-legal.md` |
-| 1 | `legal` | Terms, privacy, disclaimers, regional obligations, licenses | same |
+| 1 | `legal` | Terms and privacy accuracy, every public claim, disclaimers, regional obligations, licenses | same |
 | 2 | `performance` | Page load, query optimization, parallel calls, caching | `references/2-reliability.md` |
 | 2 | `resilience` | Retries, backoff, try/catch, timeouts, scaling | same |
 | 2 | `errors` | Proactive error handling and user-facing failure | same |
@@ -82,7 +82,7 @@ Read what's cheap and tells you the most:
 
 - `.claude/audit.md` if present (optional config, format in `references/project-config.md`). Read it from the base branch when there is one, because the code under review could otherwise switch off its own checks. If the scope changes this file, report that as a finding.
 - `CLAUDE.md`, `AGENTS.md`, the README, and the package manifest
-- The pricing or plans page, and any privacy or terms pages
+- The pricing or plans page, and any privacy or terms pages, in the repo or on the live site
 
 Record the stack, whether it has a UI, who the customers are, what plans exist, whether it handles money or personal data, and whether it calls AI providers.
 
@@ -104,7 +104,7 @@ Also run the project's own lint, type check, and the tests covering the scope if
 
 ## Step 4: Decide which lenses apply
 
-Select lenses and bundles from the arguments if given, otherwise all of them. The report lists only the selected lenses, and says the rest weren't run. Mark a lens N/A only for a concrete reason, such as "`a11y`: no UI in this repo" or "PCI: no card handling; payments go through Stripe Checkout." `security`, `consistency`, and `docs` are rarely N/A, because small text changes can still leak a secret, break a term, or make docs stale.
+Select lenses and bundles from the arguments if given, otherwise all of them. The report lists only the selected lenses, and says the rest weren't run. Mark a lens N/A only for a concrete reason, such as "`a11y`: no UI in this repo" or "PCI: no card handling; payments go through Stripe Checkout." `security`, `legal`, `consistency`, and `docs` are rarely N/A, because small text changes can still leak a secret, break a promise, break a term, or make docs stale.
 
 If `personas` applies, settle who the personas are before any review starts:
 
@@ -183,6 +183,6 @@ If there are findings to fix and `--fix` wasn't passed, ask which ones. Only ask
 
 ## Step 8: Fix (only with `--fix` or after approval)
 
-`--fix` covers Critical, High, and Medium without asking. Otherwise fix what the user approved.
+`--fix` covers Critical, High, and Medium without asking. Otherwise fix what the user approved. Legal documents and public claims are the exception: propose the new wording, and change them only after the user approves it.
 
 Work from highest severity down. Apply each fix to every instance found, add tests for changed behavior, and run the tests covering those changes. Add a Fixes section to the report saying what changed and what didn't. Leave Ideas alone unless asked. Don't commit unless asked.

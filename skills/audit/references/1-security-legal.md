@@ -67,15 +67,43 @@ Mistakes here tend to expose every account at once, so any change touching this 
 
 Flag risks and obligations for a person to confirm. You aren't a lawyer, but say plainly what's missing and why it matters, then recommend counsel for Critical items only.
 
-**Terms and privacy**
-- Terms of service and privacy policy exist, are linked where users sign up and pay, and match what the product actually does today. A new data type, vendor, cookie, or AI provider in this scope usually means the privacy policy is stale.
-- Each subprocessor and data transfer is disclosed. AI providers: state whether customer data is sent and whether it's used for training.
-- Age limits, refund and cancellation terms, auto-renewal disclosure, and easy cancellation where required.
+This lens has to read beyond the diff, because a code change can break a promise made on a page the diff never touches.
+
+**Terms and privacy exist**
+- Terms of service and privacy policy exist and are linked where users sign up and pay.
+- Find them in the repo, then on the live site if the project gives its URL. If they can't be read, mark this part Not verified, never Pass.
+
+**Terms and privacy are still accurate**
+
+On a diff, check every statement the change could affect. On `all`, go through each document statement by statement. Work in both directions: what the documents say against the code, and what the code does against the documents. A new data type, vendor, cookie, or AI provider usually means the privacy policy is stale.
+
+- **Data collected:** every field, upload, log, and analytics event is covered, and nothing listed has stopped being true.
+- **Why and with whom:** each purpose is real. Every subprocessor and data transfer is disclosed, checked against dependencies, env vars, scripts, tags, and server calls. AI providers: state whether customer data is sent and whether it's used for training.
+- **Cookies and tracking:** the list matches what the app actually sets and loads.
+- **Retention and deletion:** stated periods are enforced by real code, and "delete" really removes the data, including from vendors and backups if promised.
+- **User rights:** every export, correction, opt-out, or unsubscribe promised actually works.
+- **Security statements:** encryption, access limits, and data location match the setup.
+- **Commercial terms:** prices, trials, refunds, cancellation, auto-renewal, limits, and uptime promises match the billing config and product. Age limits and easy cancellation are in place where required.
+- **Details:** company name, contact address, governing law, linked pages, and the last-updated date are all current.
+
+**Every claim is true**
+
+Search the whole product for claims, not just the scope: UI copy, marketing pages, pricing, emails, onboarding, help content, README, metadata, and store listings. List each claim, then trace it to the code or data that proves it.
+
+- **Features:** "works offline", "integrates with X", "real-time", "unlimited", "automatic".
+- **Numbers:** customer counts, uptime, speed, savings, accuracy, and "saves 3 hours".
+- **Security and compliance:** "secure", "encrypted", "SOC 2", "HIPAA compliant", "GDPR ready".
+- **Privacy:** "we never sell your data", "stays on your device", "no tracking".
+- **Pricing:** "free forever", "no card required", "cancel anytime", "money-back guarantee".
+- **Comparison and proof:** "#1", "fastest", competitor tables, testimonials, customer logos, awards, and fake urgency.
+
+Mark each claim True, False, Stale, or Unproven. A false or stale claim is at least High, and Critical if it's about data, security, or money. If the repo can't prove a claim, such as a customer count or a testimonial, list it for a person to confirm. Never assume it's true. Skip obvious opinion and puffery, such as "beautiful" or "delightful".
+
+A claim can be fixed by changing the product or the words. Say which you recommend. Give every checked claim a row in the report's Claims checked table, so the reader can see what was covered.
 
 **Disclaimers**
 - Add one only where the law or a real risk needs it: financial, medical, or legal information, AI-generated output people may rely on, health or safety, earnings claims.
 - A disclaimer that draws attention to a weakness without reducing real risk hurts the product's image. Flag unnecessary ones for removal or quieter placement (terms instead of the main UI) as well as flagging missing ones.
-- Marketing claims must be true and provable: "secure", "HIPAA compliant", "#1", "guaranteed", fake urgency, invented testimonials.
 
 **Region-specific features**
 - GDPR/UK GDPR: lawful basis, consent before non-essential cookies, data export and deletion, DPA for business customers.
