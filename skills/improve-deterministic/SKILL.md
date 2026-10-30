@@ -40,18 +40,21 @@ Everything for one algorithm lives in `.improve/<slug>/` at the project root, ke
 ├── plan.md         The logic, data, and judge found in Step 1
 ├── ledger.md       Baseline, each round's scores, and what was tried
 ├── data/           Copied or synthetic data, if any
+├── regression/     Cases that must stay fixed, beside the data they use
 ├── labels/         The answer key, cached by input hash
 └── cache/          Run outputs, cached by input and rule version
 ```
 
 **`guidance.md`:** add every correction or direction the user gives, in their words where possible, with the date. If the folder already exists, read this file first. Pass it to judges and reviewers. Each lasting rule also becomes a regression case, so the mistake can't return.
 
+**`regression/`:** one case per fixed mistake or correction, holding the input or its path, the expected result, why it matters, and the `guidance.md` entry behind it. These run against the real data, so they can include private cases that could never go in public tests. The test command runs them first, because a failure here ends the check early.
+
 **`manifest.md`:** one row per source.
 
 | Source | Kept | Private | Fields | Items | Size | Added | Cleanup |
 |---|---|---|---|---|---|---|---|
 
-"Kept" is `in place`, `copied`, `synthetic`, or `in memory`. Derived files inherit the source's privacy: labels and cached outputs from email are private too.
+"Kept" is `in place`, `copied`, `synthetic`, or `in memory`. Derived files inherit the source's privacy: labels, regression cases, and cached outputs from email are private too.
 
 ## Step 1: Find what's needed
 
@@ -175,7 +178,7 @@ Where the design allows it, make the logic return "unsure" for these cases, and 
 ## Step 8: Finish
 
 1. Score Final once. If it's far below Validation, the rules overfit, and the report must say so first.
-2. Turn the regression cases into project tests using synthetic or scrubbed data, following the repo's test style. Never copy private data into tests or anywhere else tracked by git. This also keeps those lessons if `.improve/` is lost, since that folder isn't backed up by git.
+2. Copy the regression cases into project tests using synthetic or scrubbed data, following the repo's test style. The full set stays in `regression/`. Never copy private data into tests or anywhere else tracked by git. This also keeps those lessons if `.improve/` is lost, since that folder isn't backed up by git.
 3. Run the project's tests, and confirm no `.improve/` file is tracked on the branch. Read the branch's diff and commit messages for anything that breaks the tracked text rule, and reword it before reporting.
 4. Report:
     - **Result first:** the outcome, and baseline against Final score
@@ -197,5 +200,5 @@ Deleting needs a clear yes every time.
 
 1. Read `manifest.md`, and show each copied item, its size, and whether it's private. Sources kept `in place` are the user's own files, and they stay untouched.
 2. Ask what to remove. Offer private data only, or the whole folder. Private data only keeps `guidance.md`, so the lessons survive, along with any non-private labels.
-3. Delete only what they chose, and update the manifest. Say that labels and caches derived from private data go with it, which makes the next run slower and costs more.
+3. Delete only what they chose, and update the manifest. Say that labels, regression cases, and caches derived from private data go with it, which makes the next run slower and costs more. Scrubbed copies in the project's tests stay.
 4. If the whole folder goes, remove its `AGENTS.md` section too, on a branch, and tell the user.
