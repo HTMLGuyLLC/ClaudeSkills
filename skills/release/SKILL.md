@@ -106,10 +106,12 @@ After pushing, request Copilot again if it doesn't review new commits by itself.
 
 Skip this with `--no-merge`.
 
-Run `pr-state.sh` right before merging. `mergeable: UNKNOWN` means GitHub is still working it out, so run it again after a few seconds. Merge only on `ready: yes`:
+Run `pr-state.sh` right before merging. `mergeable: UNKNOWN` means GitHub is still working it out, so run it again after a few seconds. GitHub can also lag just after a push, so `head` must equal `git rev-parse HEAD`. Otherwise the result describes an older commit.
+
+Merge only on `ready: yes`, pinned to that commit so nothing newer can slip in unchecked:
 
 ```bash
-gh pr merge <n> --<method>
+gh pr merge <n> --<method> --match-head-commit <head>
 ```
 
 Use the method the repo allows, and `--delete-branch` unless the repo already deletes branches. If rules block the merge, stop. Don't enable auto-merge unless the user asks for it.
