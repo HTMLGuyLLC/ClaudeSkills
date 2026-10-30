@@ -65,9 +65,59 @@ If these live outside the repo, list what needs updating and mark it Not verifie
 
 ## ux
 
-- **States:** loading, empty, error, success, partial, offline, and long-content cases all designed.
-- **Forms and flows:** clear next action, undo or confirmation for destructive actions, no lost work, and feedback within 100ms.
-- **Responsive:** phone, tablet, desktop, and touch, with no horizontal scroll.
-- **Cross-browser:** works on the browsers the product supports.
+**Attention and eye flow**
+- Squint test: name the first, second, and third things the eye lands on. They should be the most important things on the page, in that order.
+- One clear focal point per view. Flag competing elements of equal weight, and decoration that outshouts content.
+- Size, color, contrast, spacing, and motion lead the eye along a path that ends at the next action.
+- Accent color is saved for what matters. If everything stands out, nothing does.
+- The main message and action are visible without scrolling, and a first-time visitor can say what the page is for within 5 seconds.
+- Anything that moves or pops up has to be worth the interruption.
+
+**Calls to action**
+- Each page or screen has one primary action, and it's obvious which one. Secondary and tertiary actions look clearly quieter.
+- The hierarchy matches the business goal: the most valuable action gets the most weight, and key actions are pushed rather than buried.
+- Labels say what happens next, as in "Start free trial" rather than "Submit" or "Click here".
+- Long pages repeat the CTA at natural decision points, and the same action keeps the same label and style everywhere.
+- Friction near the CTA is low: few fields, no surprise sign-up walls, and the price or commitment is clear before the click.
+- Reassurance sits close to the decision, such as "no card required", proof, or guarantees, but only if it's true.
+- Destructive actions are never styled as the primary action.
+- No dark patterns: fake urgency, guilt-trip decline buttons, hidden cancel paths, or pre-ticked upsells.
+
+**Hierarchy and layout**
+- Type scale, weight, and spacing show what's related and what matters. Pages can be scanned through headings and short blocks.
+- Alignment and spacing follow a consistent rhythm, and line length stays readable.
+- Cognitive load is low: few choices at once, sensible grouping, and detail revealed when it's needed.
+- Users always know where they are, how to get back, and what to do next. Page state survives refresh and deep links.
+
+**Light and dark mode**
+- Both themes are designed, not inverted. Each has its own hierarchy, and the focal point and CTA stand out equally in both.
+- Follows the system preference, lets the user override it, remembers the choice, and doesn't flash the wrong theme on load.
+- Check what's usually missed: logos, images, icons, charts, shadows, borders, status colors, focus rings, native controls and scrollbars (`color-scheme`), third-party embeds, emails, and PDFs.
+- No hardcoded colors that bypass the theme tokens. Contrast is covered by `a11y`.
+- If only one theme exists, report dark mode as an Idea, not a defect.
+
+**Mobile and screen sizes**
+- Check 320, 375, 430, 768, 1024, 1440, and 1920+ wide, plus phone landscape. Also check sizes between breakpoints, where layouts tend to break.
+- No horizontal scroll, clipped text, or overlapping elements. Tables, code blocks, and long words have a mobile plan.
+- Mobile gets a designed layout, not a shrunken desktop one. The priority order still works when columns stack, and the primary CTA stays easy to reach.
+- Primary actions sit within thumb reach, and targets aren't crowded.
+- Nothing depends on hover. Long-press, swipe, and drag have visible alternatives.
+- Forms use the right `inputmode`, `autocomplete`, and `type`. Input text is at least 16px so iOS doesn't zoom, and the on-screen keyboard doesn't cover the field or submit button.
+- Sticky headers, banners, and cookie bars don't eat the small screen. Safe areas and notches are respected, and `100dvh` is used where `100vh` breaks.
+- Modals, menus, and date pickers work on a phone. Images use the right sizes so phones don't download desktop assets.
+- Large screens use the space well, with a sensible max width rather than stretched lines.
+
+**States and feedback**
+- Loading, empty, error, success, partial, offline, and long-content cases are all designed. Empty states lead to the next action.
+- Controls show hover, focus, pressed, disabled, and selected states.
+- Forms and flows have a clear next action, undo or confirmation for destructive actions, no lost work, and feedback within 100ms.
+- Slow work feels fast: skeletons, progress, optimistic updates, and no layout shift as content loads.
+- Motion explains what changed, and stays short.
+
+**Reach**
+- **First run:** a new user reaches first value quickly, with guidance that doesn't block them.
+- **Cross-browser:** works on the browsers the product supports, including Safari on iOS.
 - **i18n:** strings not hardcoded if the product is translated, long-text and right-to-left layouts, and locale formats.
 - **SEO and sharing (public pages):** titles, descriptions, canonical URLs, sitemaps, structured data, and Open Graph images.
+
+**How to check:** run the app and take screenshots of each key page at the widths above, in both themes, then judge what you see. Look at the page before reading its code, so the code doesn't tell you what you're supposed to see. Attention, hierarchy, theme, and layout can't be proven from code, so mark them Not verified without a running app or screenshots. Give each finding the page, width, and theme where it shows up.

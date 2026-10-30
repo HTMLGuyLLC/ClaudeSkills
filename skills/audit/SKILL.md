@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance, resilience, error handling, logging, alerting, analytics, accessibility, best practices, tests, simplicity, innovation, AI cost, code quality, legal, docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
+description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance, resilience, error handling, logging, alerting, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, legal, docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
 argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens or bundle,...] [--quick] [--fix]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scope.sh *)
@@ -46,7 +46,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 5 | `simplicity` | Plain words, fast setup, progressive depth | same |
 | 5 | `consistency` | Verbiage, design, architecture, ideals | same |
 | 5 | `docs` | README, markdown, help center, blog, changelog | same |
-| 5 | `ux` | UI states, responsive, i18n, SEO | same |
+| 5 | `ux` | Attention, CTAs, light and dark mode, mobile, UI states, i18n, SEO | same |
 | 6 | `personas` | Walkthroughs as each customer type | `references/6-product.md` |
 | 6 | `plans` | Plan gating, billing, upgrade and downgrade paths | same |
 | 6 | `innovation` | AI or new technology that makes it feel slick | same |
@@ -100,7 +100,7 @@ For code the user didn't write, such as someone else's PR, add `--no-project-cod
 
 If no scanner reported on dependency versions, compare the direct dependencies with the registry yourself (`npm view <package> version`, or the web for other ecosystems). This applies in `--quick` too. Known vulnerabilities stay Not verified if nothing could check them.
 
-Also run the project's own lint, type check, and the tests covering the scope if the commands are clear from its manifest. If a dev server config exists and the scope touches UI, use it for real page-load and accessibility measurements. A lens that needs one of these and didn't get it is Not verified.
+Also run the project's own lint, type check, and the tests covering the scope if the commands are clear from its manifest. If a dev server config exists and the scope touches UI, use it for real page-load and accessibility measurements, and for the `ux` screenshots. A lens that needs one of these and didn't get it is Not verified.
 
 ## Step 4: Decide which lenses apply
 
