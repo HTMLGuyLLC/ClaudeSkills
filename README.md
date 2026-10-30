@@ -15,7 +15,7 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 
 ### `/audit`
 
-**What it does:** Reviews your code like a team of experts, covering security, speed, accessibility, legal, and more. It gives you a clear answer: Ship, Ship after fixes, or Don't ship. It doesn't change your code unless you ask.
+**What it does:** Reviews your code like a team of experts, covering security, speed, accessibility, design, legal, and more. It gives you a clear answer: Ship, Ship after fixes, or Don't ship. It doesn't change your code unless you ask.
 
 **Check what you're working on now:**
 
@@ -50,6 +50,14 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 ```text
 /audit personas
 ```
+
+**Check how your pages look and work:**
+
+```text
+/audit ux
+```
+
+This checks what catches the eye, whether the main buttons push people toward the key actions, light and dark mode, and mobile at every screen size. It also covers layout, loading and error states, and first-time use. It needs a running app or screenshots to judge how things look.
 
 **Check a group of topics:**
 
