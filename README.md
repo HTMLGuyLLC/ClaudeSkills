@@ -9,6 +9,7 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 | [`/personas`](#personas) | Builds a list of the people who use your product, and lets them debate decisions |
 | [`/release`](#release) | Takes finished work all the way from commit to live release |
 | [`/improve-deterministic`](#improve-deterministic) | Makes your rules-based logic more accurate, without AI in the final product |
+| [`/cleanup`](#cleanup) | Clears out finished worktrees and branches, and asks before touching unfinished work |
 
 ## How to use each skill
 
@@ -186,6 +187,36 @@ You can use `patch`, `minor`, `major`, or an exact version.
 ```
 
 Its data stays in a `.improve/` folder that git ignores. That folder may hold private data, and it asks before copying or deleting anything private.
+
+### `/cleanup`
+
+**What it does:** Reviews the git worktrees in every repo Claude has worked in. It removes the ones whose work is merged and that nothing is using, along with merged branches and dead worktree records. It shows you anything unfinished and asks first, and it never touches a worktree that a chat or process is using.
+
+**Clean up everything:**
+
+```text
+/cleanup
+```
+
+**See what it would do, without removing anything:**
+
+```text
+/cleanup --dry-run
+```
+
+**Check one repo:**
+
+```text
+/cleanup ~/Web/my-app
+```
+
+**Do only the safe removals, and list the rest for later:**
+
+```text
+/cleanup --no-ask
+```
+
+Commits that only a detached worktree holds are saved to a `rescue/` branch before it's removed. If you remove unfinished work and keep it, the branch stays and uncommitted changes go to a stash. It never deletes remote branches or chat history. Full detection needs the Claude desktop app on a Mac, and it works from `git` alone elsewhere.
 
 ## Set up a machine
 

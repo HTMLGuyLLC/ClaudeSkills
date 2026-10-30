@@ -9,7 +9,9 @@ scope="$repo/skills/audit/scripts/scope.sh"
 scanners="$repo/skills/audit/scripts/scanners.sh"
 find_personas="$repo/skills/personas/scripts/find.sh"
 debate_path="$repo/skills/personas/scripts/debate-path.sh"
-work=$(mktemp -d)
+cleanup_scan="$repo/skills/cleanup/scripts/scan.sh"
+cleanup_remove="$repo/skills/cleanup/scripts/remove.sh"
+work=$(cd "$(mktemp -d)" && pwd -P)
 trap 'rm -rf "$work"' EXIT
 failures=0
 total=0
@@ -45,6 +47,7 @@ answer() { if [ -n "$jq_expr" ]; then printf '%s' "$1" | jq -r "$jq_expr"; else 
 case "$1 $2" in
   "pr view") answer "${STUB_VIEW:?}" ;;
   "repo view") echo o/r ;;
+  "pr list") [ -z "${STUB_PR_FAIL:-}" ] || exit 1; answer "${STUB_PRS:-[]}" ;;
   "api graphql") answer "${STUB_THREADS:-$no_threads}" ;;
   "pr checks")
     case "${STUB_CHECKS:-pass}" in
@@ -254,6 +257,213 @@ reject "find skips debates" ".claude/debates" "$(cd "$d" && bash "$find_personas
 out=$(cd "$plain_dir" && bash "$debate_path" topic 2>&1)
 expect "debate path works outside git" ".claude/debates/$today-topic.md" "$out"
 
+# --- cleanup: what's safe to remove
+ch="$work/cleanup-home"
+app="$ch/Library/Application Support/Claude"
+mkdir -p "$ch/.claude/sessions" "$app/claude-code-sessions/a/b"
+scan() { (cd "$work" && HOME="$ch" PATH="$stub:$PATH" CLEANUP_RECENT_HOURS="${HOURS:-0}" bash "$cleanup_scan" --no-fetch "$@" 2>&1); }
+rm_tree() { (cd "$work" && HOME="$ch" PATH="$stub:$PATH" CLEANUP_RECENT_HOURS=0 bash "$cleanup_remove" "$@" 2>&1); }
+only() { scan --only "$1"; }
+chat() { printf '{"sessionId":"local_%s","cwd":"%s","isArchived":%s,"lastActivityAt":%s,"title":"Old chat"}\n' \
+  "$RANDOM" "$1" "$2" "$3" > "$app/claude-code-sessions/a/b/local_$RANDOM$RANDOM.json"; }
+
+r=$(new_repo)
+echo a > "$r/a.txt"; printf '.env\nnode_modules/\nkeep/\n' > "$r/.gitignore"
+git -C "$r" add . && git -C "$r" commit -q -m one
+
+# A worktree on its own new branch, with one commit when a name is given.
+tree() { # <name> [file]
+  git -C "$r" worktree add -q -b "$1" "$work/wt-$1"
+  if [ -n "${2:-}" ]; then
+    echo "$1" > "$work/wt-$1/$2"
+    git -C "$work/wt-$1" add . && git -C "$work/wt-$1" commit -q -m "work on $1"
+  fi
+  echo "$work/wt-$1"
+}
+
+w=$(tree empty)
+out=$(only "$w")
+expect "merged is safe" "class: merged" "$out"
+expect "ancestor reported" "merged: ancestor" "$out"
+out=$(rm_tree worktree "$w")
+expect "merged worktree removed" "removed: $w" "$out"
+expect "merged branch deleted" "deleted_branch: empty" "$out"
+[ ! -e "$w" ] && pass || fail "merged worktree should be gone"
+
+w=$(tree squashed s.txt)
+echo more >> "$w/s.txt"; git -C "$w" commit -qam "more"
+git -C "$r" merge -q --squash squashed >/dev/null && git -C "$r" commit -q -m "squash"
+echo c > "$r/c.txt"; git -C "$r" add . && git -C "$r" commit -q -m "later"
+expect "squash merge detected" "merged: no-diff" "$(only "$w")"
+expect "squash merge is safe" "class: merged" "$(only "$w")"
+rm_tree worktree "$w" >/dev/null
+
+w=$(tree picked p.txt)
+git -C "$r" cherry-pick -n picked >/dev/null && git -C "$r" commit -q -m "picked again"
+expect "rebased commit detected" "merged: patch" "$(only "$w")"
+rm_tree worktree "$w" >/dev/null
+
+w=$(tree open o.txt)
+git -C "$r" update-ref refs/remotes/origin/pushed main
+out=$(only "$w")
+git -C "$r" update-ref -d refs/remotes/origin/pushed
+expect "unmerged asks" "class: ask" "$out"
+expect "unmerged reason" "work isn't merged" "$out"
+expect "unmerged commits counted" "unique_commits: 1" "$out"
+expect "local-only commits counted" "local_only_commits: 1" "$out"
+out=$(rm_tree worktree "$w"); code=$?
+expect "unmerged needs approval" "needs approval" "$out"
+[ "$code" != 0 ] && [ -e "$w" ] && pass || fail "unmerged worktree should stay without approval"
+out=$(rm_tree worktree "$w" --approved)
+expect "approved removal keeps branch" "kept_branch: open" "$out"
+git -C "$r" rev-parse -q --verify refs/heads/open >/dev/null && pass || fail "unmerged branch should survive"
+
+w="$work/wt-detached"
+git -C "$r" worktree add -q --detach "$w"
+echo d > "$w/d.txt"; git -C "$w" add . && git -C "$w" commit -q -m "detached work"
+head=$(git -C "$w" rev-parse HEAD)
+out=$(rm_tree worktree "$w" --approved)
+expect "detached commits rescued" "rescued: rescue/wt-detached-" "$out"
+[ "$(git -C "$r" rev-parse "refs/heads/$(rescue=${head:0:8}; echo "rescue/wt-detached-$rescue")")" = "$head" ] && pass || fail "rescue branch should hold the commit"
+
+w=$(tree dirty)
+echo x > "$w/new.txt"
+out=$(only "$w")
+expect "merged but dirty asks" "merged, but has uncommitted changes" "$out"
+out=$(rm_tree worktree "$w" --approved)
+expect "dirty needs a choice" "--save-changes or --discard-changes" "$out"
+out=$(rm_tree worktree "$w" --approved --save-changes)
+expect "changes stashed" "stashed: cleanup: wt-dirty" "$out"
+expect "stash kept" "cleanup: wt-dirty" "$(git -C "$r" stash list)"
+w=$(tree dirty2)
+echo x > "$w/new.txt"
+out=$(rm_tree worktree "$w" --approved --discard-changes)
+expect "discard removes" "removed: $w" "$out"
+git -C "$r" stash clear
+
+w=$(tree live)
+printf '{"pid":%s,"cwd":"%s/sub","status":"idle"}\n' "$$" "$w" > "$ch/.claude/sessions/1.json"
+out=$(only "$w")
+expect "live session blocks" "class: active" "$out"
+expect "live session named" "Claude session $$" "$out"
+out=$(rm_tree worktree "$w" --approved --discard-changes); code=$?
+[ "$code" != 0 ] && [ -e "$w" ] && pass || fail "approval must not override a live session"
+printf '{"pid":999999,"cwd":"%s","status":"idle"}\n' "$w" > "$ch/.claude/sessions/1.json"
+expect "dead session ignored" "class: merged" "$(only "$w")"
+rm "$ch/.claude/sessions/1.json"
+expect "process inside blocks" "class: active" "$(cd "$w" && HOME="$ch" CLEANUP_RECENT_HOURS=0 bash "$cleanup_scan" --no-fetch --only "$w" 2>&1)"
+rm_tree worktree "$w" >/dev/null
+
+w=$(tree chatted)
+chat "$w" false 1000
+out=$(only "$w")
+expect "open chat asks" "merged, but its chat is still open" "$out"
+expect "open chat shown" "Old chat" "$out"
+rm -f "$app"/claude-code-sessions/a/b/*.json
+chat "$w" true 1000
+expect "archived chat ignored" "class: merged" "$(only "$w")"
+rm -f "$app"/claude-code-sessions/a/b/*.json
+chat "$w" false "$(($(date +%s) * 1000))"
+expect "recent chat blocks" "class: active" "$(HOURS=24 only "$w")"
+rm -f "$app"/claude-code-sessions/a/b/*.json
+transcripts="$ch/.claude/projects/$(printf '%s' "$w" | sed 's/[^A-Za-z0-9-]/-/g')"
+mkdir -p "$transcripts" && touch "$transcripts/t.jsonl"
+expect "recent transcript blocks" "chat used in the last" "$(HOURS=24 only "$w")"
+rm -rf "$transcripts"
+expect "fresh worktree blocks" "files changed in the last" "$(HOURS=24 only "$w")"
+rm_tree worktree "$w" >/dev/null
+
+w=$(tree pooled)
+printf '{"worktrees":{"p":{"path":"%s","leasedBy":null}}}' "$w" > "$app/git-worktrees.json"
+expect "unleased is the app's pool" "class: pool" "$(only "$w")"
+out=$(rm_tree worktree "$w" --approved); code=$?
+[ "$code" != 0 ] && [ -e "$w" ] && pass || fail "pool worktrees are the app's to remove"
+echo x > "$w/x.txt"
+expect "pool with changes asks" "class: ask" "$(only "$w")"
+rm "$w/x.txt"
+printf '{"worktrees":{"p":{"path":"%s","leasedBy":"local_1"}}}' "$w" > "$app/git-worktrees.json"
+expect "leased isn't the pool" "class: merged" "$(only "$w")"
+rm "$app/git-worktrees.json"
+
+git -C "$r" worktree lock "$w"
+expect "locked blocks" "git has it locked" "$(only "$w")"
+git -C "$r" worktree unlock "$w"
+
+mkdir -p "$w/node_modules/x" "$w/keep"
+echo s > "$w/.env"; echo n > "$w/node_modules/x/a"; echo k > "$w/keep/notes.txt"
+out=$(only "$w")
+expect "ignored files protect" "merged, but holds ignored files" "$out"
+expect "ignored files listed" "ignored_files: 2 (.env, keep/)" "$out"
+rm -rf "$w/keep"
+echo s > "$r/.env"
+out=$(only "$w")
+expect "copies and dependencies don't count" "class: merged" "$out"
+reject "no ignored list" "ignored_files" "$out"
+rm_tree worktree "$w" >/dev/null
+
+git -C "$r" remote add origin https://github.com/o/r.git
+w=$(tree shipped sh.txt)
+head=$(git -C "$w" rev-parse HEAD)
+out=$(STUB_PRS="[{\"number\":7,\"state\":\"MERGED\",\"headRefOid\":\"$head\"}]" only "$w")
+expect "merged PR counts" "merged: pr#7" "$out"
+expect "merged PR is safe" "class: merged" "$out"
+out=$(STUB_PRS='[{"number":7,"state":"MERGED","headRefOid":"old"}]' only "$w")
+expect "commits after a PR ask" "class: ask" "$out"
+expect "commits after a PR noted" "later commits" "$out"
+expect "open PR shown" "pr: open #8" "$(STUB_PRS='[{"number":8,"state":"OPEN","headRefOid":"x"}]' only "$w")"
+out=$(STUB_PR_FAIL=1 only "$w")
+expect "gh failure asks" "class: ask" "$out"
+expect "gh failure shown" "pr: unknown" "$out"
+out=$(rm_tree worktree "$w" --approved --delete-branch)
+expect "approved branch delete" "deleted_branch: shipped" "$out"
+git -C "$r" remote remove origin
+
+w="$work/wt-vanish"
+git -C "$r" worktree add -q --detach "$w"
+echo v > "$w/v.txt"; git -C "$w" add . && git -C "$w" commit -q -m "vanish"
+head=$(git -C "$w" rev-parse HEAD)
+rm -rf "$w"
+mkdir -p "$r/.claude/worktrees/leftover"
+echo l > "$r/.claude/worktrees/build.log"
+git -C "$r" branch merged-one
+git -C "$r" branch unmerged-one "$head"
+git -C "$r" branch stale-one "$head"
+git -C "$r" config branch.stale-one.remote origin
+git -C "$r" config branch.stale-one.merge refs/heads/stale-one
+git -C "$r" update-ref refs/remotes/origin/keep "$head"
+out=$(scan "$r")
+expect "missing folder is prunable" "prunable: $w $head unique_commits=1" "$out"
+expect "stray file listed" "stray: $r/.claude/worktrees/build.log" "$out"
+expect "stray folder listed" "stray: $r/.claude/worktrees/leftover" "$out"
+expect "merged branch listed" "branch_merged: merged-one (ancestor)" "$out"
+reject "main isn't a merged branch" "branch_merged: main" "$out"
+expect "summary line" "summary: active=0" "$out"
+out=$(rm_tree prune "$r")
+expect "prune rescues commits" "rescued: rescue/wt-vanish-" "$out"
+expect "prune reports" "pruned: $w" "$out"
+reject "record is gone" "wt-vanish" "$(git -C "$r" worktree list)"
+expect "rescued commit kept" "${head:0:7}" "$(git -C "$r" branch --contains "$head" -v)"
+
+out=$(rm_tree branch "$r" merged-one)
+expect "merged branch deleted on its own" "deleted_branch: merged-one" "$out"
+out=$(rm_tree branch "$r" unmerged-one); code=$?
+expect "unmerged branch needs approval" "needs approval" "$out"
+[ "$code" != 0 ] && pass || fail "unmerged branch delete should fail"
+expect "approved branch deleted" "deleted_branch: unmerged-one" "$(rm_tree branch "$r" unmerged-one --approved)"
+expect "main is protected" "is the main branch" "$(rm_tree branch "$r" main --approved)"
+
+expect "stray needs approval" "need approval" "$(rm_tree stray "$r/.claude/worktrees/build.log")"
+expect "stray stays in the worktrees folder" "isn't under" "$(rm_tree stray "$r/a.txt" --approved)"
+touch "$r/.claude/worktrees/leftover/.git"
+expect "stray can't be a repo" "git worktree or repo" "$(rm_tree stray "$r/.claude/worktrees/leftover" --approved)"
+expect "stray removed" "removed:" "$(rm_tree stray "$r/.claude/worktrees/build.log" --approved)"
+
+expect "main folder refused" "isn't a linked worktree" "$(rm_tree worktree "$r" --approved)"
+expect "missing folder refused" "folder not found" "$(rm_tree worktree "$work/nope" --approved)"
+expect "not a worktree" "not a git worktree" "$(only "$plain_dir")"
+expect "bad hours rejected" "expects a number" "$(cd "$r" && HOME="$ch" CLEANUP_RECENT_HOURS=x bash "$cleanup_scan" 2>&1)"
+expect "scan finds repos from chats" "repo: $r" "$(chat "$r" true 1 && cd "$work" && HOME="$ch" bash "$cleanup_scan" --no-fetch 2>&1)"
+
 # --- install
 home="$work/home"
 mkdir -p "$home/.claude/skills"
@@ -280,7 +490,7 @@ for skill in "$repo"/skills/*/; do
   done < <(grep -oE '\$\{CLAUDE_SKILL_DIR\}/(scripts|references)/[A-Za-z0-9._-]+' "$skill/SKILL.md" | sed 's/.*}\///' | sort -u)
 done
 
-for skill in release loop-audit improve-deterministic; do
+for skill in release loop-audit improve-deterministic cleanup; do
   grep -q '^disable-model-invocation: true$' "$repo/skills/$skill/SKILL.md" && pass || fail "$skill: must be typed to run"
 done
 grep -q '^disable-model-invocation:' "$repo/skills/personas/SKILL.md" && fail "personas: audit must be able to invoke it" || pass
