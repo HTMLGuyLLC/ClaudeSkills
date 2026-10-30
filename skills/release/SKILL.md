@@ -106,7 +106,7 @@ After pushing, request Copilot again if it doesn't review new commits by itself.
 
 Skip this with `--no-merge`.
 
-Run `pr-state.sh` right before merging. Merge only on `ready: yes`:
+Run `pr-state.sh` right before merging. `mergeable: UNKNOWN` means GitHub is still working it out, so run it again after a few seconds. Merge only on `ready: yes`:
 
 ```bash
 gh pr merge <n> --<method>
