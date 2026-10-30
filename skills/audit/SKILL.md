@@ -185,6 +185,8 @@ If there are findings to fix and `--fix` wasn't passed, ask which ones. Only ask
 
 `--fix` covers Critical, High, and Medium without asking. Otherwise fix what the user approved.
 
-Legal documents and public claims are fixed like anything else, because leaving them wrong is the bigger risk. Change only what's inaccurate, make it match what the product does, and update any last-updated date. Don't add new promises. These edits never block the fix, but the user must review them afterwards, as described below.
+Legal documents and public claims are fixed like anything else, because leaving them wrong is the bigger risk. Change only what's inaccurate, make it match what the product does, and update any last-updated date. These edits never block the fix, but the user must review them afterwards, as described below.
+
+The one exception is a new or bigger promise to customers that would cost the user time or money, such as a refund, guarantee, uptime or support commitment, or a free feature. Don't make that edit on your own. Ask in this chat, when you find it, showing the exact wording and what it would cost. Keep fixing everything else while you wait. If nobody can answer, leave that wording unchanged and list it in the report.
 
 Work from highest severity down. Apply each fix to every instance found, add tests for changed behavior, and run the tests covering those changes. Add a Fixes section to the report saying what changed and what didn't. If any legal document or public claim changed, add a Review these list to that section and repeat it in chat: the old and new wording for each edit, and whether the change is big enough that users should be told. Leave Ideas alone unless asked. Don't commit unless asked.

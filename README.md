@@ -65,7 +65,7 @@ This checks what catches the eye, whether the main buttons push people toward th
 /audit legal
 ```
 
-This compares your privacy policy and terms with what the product really does. It also checks every claim on your site and in your app, like "cancel anytime" or "99.9% uptime", and marks each one True, False, Stale, or Unproven. With `--fix`, it corrects anything out of date right away, then lists each old and new wording for you to review afterwards.
+This compares your privacy policy and terms with what the product really does. It also checks every claim on your site and in your app, like "cancel anytime" or "99.9% uptime", and marks each one True, False, Stale, or Unproven. With `--fix`, it corrects anything out of date right away, then lists each old and new wording for you to review afterwards. The one exception is a new promise that would cost you time or money, like a refund or a support commitment. It asks you about those in the chat first.
 
 **Check a group of topics:**
 
