@@ -65,7 +65,7 @@ This checks what catches the eye, whether the main buttons push people toward th
 /audit legal
 ```
 
-This compares your privacy policy and terms with what the product really does. It also checks every claim on your site and in your app, like "cancel anytime" or "99.9% uptime", and marks each one True, False, Stale, or Unproven. It always asks before rewording legal pages or claims, even with `--fix`.
+This compares your privacy policy and terms with what the product really does. It also checks every claim on your site and in your app, like "cancel anytime" or "99.9% uptime", and marks each one True, False, Stale, or Unproven. With `--fix`, it corrects anything out of date right away, then lists each old and new wording for you to review afterwards.
 
 **Check a group of topics:**
 
@@ -78,7 +78,7 @@ The groups are `protect`, `reliability`, `observability`, `engineering`, `experi
 **Options:**
 
 - `--quick` looks only for serious problems, and costs less.
-- `--fix` also fixes the Critical, High, and Medium problems it finds, except legal pages and claims.
+- `--fix` also fixes the Critical, High, and Medium problems it finds.
 
 ```text
 /audit pr 123 --quick

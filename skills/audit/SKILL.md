@@ -183,6 +183,8 @@ If there are findings to fix and `--fix` wasn't passed, ask which ones. Only ask
 
 ## Step 8: Fix (only with `--fix` or after approval)
 
-`--fix` covers Critical, High, and Medium without asking. Otherwise fix what the user approved. Legal documents and public claims are the exception: propose the new wording, and change them only after the user approves it.
+`--fix` covers Critical, High, and Medium without asking. Otherwise fix what the user approved.
 
-Work from highest severity down. Apply each fix to every instance found, add tests for changed behavior, and run the tests covering those changes. Add a Fixes section to the report saying what changed and what didn't. Leave Ideas alone unless asked. Don't commit unless asked.
+Legal documents and public claims are fixed like anything else, because leaving them wrong is the bigger risk. Change only what's inaccurate, make it match what the product does, and update any last-updated date. Don't add new promises. These edits never block the fix, but the user must review them afterwards, as described below.
+
+Work from highest severity down. Apply each fix to every instance found, add tests for changed behavior, and run the tests covering those changes. Add a Fixes section to the report saying what changed and what didn't. If any legal document or public claim changed, add a Review these list to that section and repeat it in chat: the old and new wording for each edit, and whether the change is big enough that users should be told. Leave Ideas alone unless asked. Don't commit unless asked.
