@@ -24,8 +24,8 @@ Read `~/.claude/skills/audit/SKILL.md` first. Each round follows its Steps 2 to 
 
 1. Resolve the scope once with the audit skill's `scope.sh`, and keep that result for the whole loop. Never re-resolve it: after the first fix, `auto` would pick something else.
 2. If the scope is an open PR, its branch must be checked out, or the fixes land on the wrong code. If it isn't, stop and tell the user.
-3. Record a restore point with `git stash create`. This changes nothing and prints a commit hash for tracked changes; if it prints nothing, the restore point is `HEAD`. Untracked files aren't covered.
-4. Create the ledger at `.claude/audits/loop-YYYY-MM-DD-<label>.md`, and add `.claude/audits/` to the git exclude as the audit skill describes. If an unfinished ledger for this scope already exists, continue from it and say so.
+3. Create the ledger at `.claude/audits/loop-YYYY-MM-DD-<label>.md`, and add `.claude/audits/` to the git exclude as the audit skill describes. If an unfinished ledger for this scope already exists, continue from it and say so.
+4. Record a restore point with `git stash create`. This changes nothing and prints a commit hash for tracked changes; if it prints nothing, the restore point is `HEAD`. That doesn't cover untracked files, so copy any in the scope to `.claude/audits/loop-YYYY-MM-DD-<label>-restore/`, keeping their paths.
 
 ## The ledger
 
@@ -39,7 +39,7 @@ Scope: <mode>, <diff_cmd>, <files>
 Max rounds: <n>
 
 ## Rounds
-| Round | Type | Critical | High | Medium | Fixed | Parked | Tests |
+| Round | New Critical | New High | New Medium | Fixed | Newly parked | Tests |
 
 ## Open
 ## Fixed
@@ -58,9 +58,7 @@ Identify a finding by its lens, file, and problem rather than its line number, s
 
 ### 1. Audit
 
-Round 1 is full: every applicable lens. Later rounds are partial: only groups with open findings, plus groups whose lenses relate to the files changed in the last round.
-
-Use fresh agents every round, so they aren't anchored to earlier opinions. Add this to each brief:
+Run every applicable lens each round, because a fix in one area can break another. Use fresh agents every round, so they aren't anchored to earlier opinions. Add this to each brief:
 
 ```
 This is round N of a fix loop. Also review the current fixes with: git diff HEAD
@@ -69,14 +67,14 @@ Don't re-raise anything below unless the code it depends on has changed:
 [Dismissed and Rare edge cases from the ledger]
 ```
 
-Run the project's lint and tests each round. Run `scanners.sh` in Round 1 and again if dependencies changed. Reuse earlier lens results for groups you skip. Use the audit skill's Step 6 to verify every round.
+Run the project's lint and tests each round. If the changed code can't be run, say so in the ledger and mark `tests` Not verified rather than reporting a pass. Run `scanners.sh` in Round 1 and again if dependencies changed. Use the audit skill's Step 6 to verify every round.
 
 ### 2. Sort
 
 Put every finding in one bucket:
 
 - **Fix:** every Critical, High, and Medium, unless it belongs in Needs you. Also any Low that's cheap to fix (effort S) and isn't a rare edge case.
-- **Needs you:** a person has to act or decide. This covers rotating leaked secrets or anything outside the repo, wording of legal text, pricing or plan changes, product or design choices with no clear answer, major dependency upgrades with breaking changes, and migrations that destroy or rewrite data.
+- **Needs you:** a person has to act or decide. This covers rotating leaked secrets or anything outside the repo, wording of legal text, pricing or plan changes, product or design choices with no clear answer, major dependency upgrades with breaking changes, migrations that destroy or rewrite data, and new designs for auth, sessions, payments, or schema when the repo has no pattern to follow. Don't invent a security design to clear a finding.
 - **Rare edge case:** Low severity, and it needs unusual conditions or barely matters when it happens. Write down the condition. If you can't name one, it isn't rare.
 - **Dismissed:** verification showed it's wrong or already handled.
 - **Idea:** record it in the final report and don't build it.
@@ -89,20 +87,20 @@ Stop at the first one that applies:
 
 | Outcome | When |
 |---|---|
-| **Clean** | A full round found nothing in Fix. If a partial round finds nothing, run one full round first, because fixes can break lenses the partial round skipped. |
-| **Round cap** | This was round `--max` (default 5). |
-| **Stalled** | The Fix count hasn't fallen for two rounds in a row. |
+| **Clean** | This round found nothing in Fix. |
+| **Round cap** | This was round `--max` (default 5, minimum 2). Apply any effort S fixes first and list them as not re-audited. Everything else stays Open. |
+| **Stalled** | The Fix count was at least as high as the previous round's, two rounds in a row. |
 | **Blocked** | Tests or the build stayed broken after two repair attempts, or an unexpected file change appeared. |
 
 ### 4. Fix
 
-Follow the audit skill's Step 8, working from highest severity down. Add tests for changed behavior. Then run the tests covering those changes and repair anything that broke before starting the next round. Log each fix in the ledger with the files it changed.
+Follow the audit skill's Step 8, working from highest severity down. A fix may touch files outside the scope when it has to. Add tests for changed behavior. Then run the tests covering those changes and repair anything that broke before starting the next round. Log each fix in the ledger with the files it changed.
 
 Give the user one line per round: `Round 2: 1 High, 4 Medium, 5 fixed, 1 parked, tests pass.` Keep going without asking for approval.
 
 ## Finish
 
-Write the final audit report with the audit skill's Step 7, using the last round's results, and mark the ledger's status. Then show in chat:
+Write the report file from the audit skill's Step 7 using the last round's results, then mark the ledger's status. Use the chat format below instead of Step 7's, and don't ask which findings to fix. Show in chat:
 
 - **Outcome first:** Clean, Round cap, Stalled, or Blocked, in one line. If anything Critical or High is parked, say "Not ready to ship" and why.
 - **Needs you:** every item, with what to do. This is the main thing the user must read.
@@ -111,6 +109,6 @@ Write the final audit report with the audit skill's Step 7, using the last round
 - **Rare edge cases left alone:** each with its trigger, so the user can disagree.
 - **Not verified:** what wasn't checked, and what would verify it.
 - **Ideas:** a short list.
-- **Files:** the ledger, the report, and the restore point.
+- **Files:** the ledger, the report, the restore point, and any restore folder.
 
 State that nothing was committed, unless the user asked for a commit.
