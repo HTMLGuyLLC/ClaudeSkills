@@ -59,7 +59,7 @@ Use the repo's PR template if it has one. Describe what changed and why. Then as
 gh pr edit <n> --add-reviewer @copilot
 ```
 
-If that fails, Copilot isn't available here. Note it and move on. Don't wait for a reviewer that was never requested.
+A clean exit doesn't prove the request worked, because GitHub silently ignores it where Copilot isn't enabled. Run `pr-state.sh`, which shows Copilot under `pending_reviewers` or `copilot_review` if it registered. If it didn't, note that Copilot isn't available here and move on. Don't wait for a reviewer that was never requested.
 
 ## 4. Wait for results
 
