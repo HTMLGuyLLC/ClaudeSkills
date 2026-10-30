@@ -32,7 +32,7 @@ Clear out finished work without ever losing unfinished work.
 ${CLAUDE_SKILL_DIR}/scripts/scan.sh [repo paths]
 ```
 
-It takes about a minute, so don't cut it short. It fetches each repo, then prints a block per worktree. Each `class` means:
+It can take a minute or more, so don't cut it short. It fetches the repos at the same time, then prints a block per worktree. Each `class` means:
 
 | class | Meaning | What to do |
 |---|---|---|
@@ -67,11 +67,11 @@ ${CLAUDE_SKILL_DIR}/scripts/remove.sh prune <repo>           # each repo with pr
 ${CLAUDE_SKILL_DIR}/scripts/remove.sh branch <repo> <name>   # each branch_merged line
 ```
 
-`prune` first saves any commits that only a dead record held to a `rescue/` branch.
+`prune` first saves any commits that only a dead record held to a `rescue/` branch. Removals from different repos can go in one message, but run each repo's in order, because git locks a repo during changes.
 
 ## Step 3: Ask about the rest
 
-For each `ask` worktree, look at what's actually there before asking:
+For each `ask` worktree, look at what's actually there before asking. Run these for all of them in one message:
 
 ```bash
 git -C <path> log --oneline <base>..HEAD | head -n 10

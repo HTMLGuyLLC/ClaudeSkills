@@ -58,7 +58,7 @@ Everything for one algorithm lives in `.improve/<slug>/` at the project root, ke
 
 ## Step 1: Find what's needed
 
-Search the project and work out:
+Search the project, sending independent searches in one message, and work out:
 
 1. **The logic:** where it lives (functions, config, or a rules file), its inputs and outputs, and its tests.
 2. **The data:** what produces or populates its input, and how to run that safely. Use the order in Step 3.
@@ -88,7 +88,7 @@ If the target could mean several things, ask. If `.improve/<slug>/` exists, resu
 
    Keep private details out of this text, since `AGENTS.md` is committed. If neither file exists, include creating `AGENTS.md` in the plan.
 4. **Work on a branch.** Use a git worktree on a local branch named `improve/<slug>`, so other work in the checkout is untouched. Commit each kept change there, which makes every change easy to review or drop. Don't push. The `.improve/` folder stays in the main checkout, so use its full path.
-5. **Write a repeatable test command.** It runs the algorithm over a dataset and prints the scores, and it should take seconds. Scoring must be deterministic, so the same input always gives the same number. Cache parsed data, outputs, and labels, so nothing is paid for twice. Keep it in the working folder, or with the project's tests if it holds no private data.
+5. **Write a repeatable test command.** It runs the algorithm over a dataset and prints the scores, and it should take seconds. Run cases across CPU cores when the logic allows it, and let the command take a rule to skip, so pruning can test every removal at once. Scoring must be deterministic, so the same input always gives the same number. Cache parsed data, outputs, and labels, so nothing is paid for twice. Keep it in the working folder, or with the project's tests if it holds no private data.
 
 ## Step 3: Get the data
 
@@ -119,6 +119,8 @@ Use the best source available, in this order:
 4. An independent AI judge
 
 **For an AI judge:** use a fresh subagent that sees the input, `guidance.md`, and a written definition of "good", but not the algorithm or its output. Otherwise it just agrees with the logic. Use the cheapest model that labels reliably, and test that by comparing it to a stronger model on a sample. Record a confidence and a source for each label, so human labels stay locked.
+
+**For more than about 50 items,** split them into batches and spawn up to 5 judges in one message. Give them all the same definition and `guidance.md`. Put the same 5 items in every batch: if the judges disagree on those, the definition is too vague, so fix it before keeping any labels.
 
 **Check the judge before trusting it.** Show the user about 20 labels, including low-confidence ones and cases where the judge and algorithm disagree, and ask for corrections. Add those corrections to `guidance.md`. If many are wrong, fix the definition of "good" and relabel. The score can never be better than the answer key.
 
@@ -152,7 +154,9 @@ Repeat up to `--max` rounds (default 10):
     - It doesn't fall on Validation, and guardrails hold.
     - Every regression case stays fixed, including those from `guidance.md`.
 4. **Decide:** commit if all three pass. If the score ties and the logic is simpler, commit too. Otherwise revert that change. Record the outcome either way, since failures show what doesn't work.
-5. **Prune:** every third round, try removing each rule. Remove any whose absence changes nothing.
+5. **Prune:** every third round, try removing each rule, running all those checks at once. Remove any whose absence changes nothing.
+
+**Unrelated failures can run side by side.** When the top failure groups have different root causes and touch different rules, try up to 3 at once, with one agent per group in its own temporary worktree off `improve/<slug>`. Give each one change to make, these rules, and the full path to `.improve/<slug>/`. It runs the three checks, commits nothing, and returns its diff and scores. Then apply the passing changes to the branch one at a time, running the three checks again after each, because two good changes can clash. Each attempt counts as one round, so Validation isn't checked any more often than usual.
 
 Pull fresh data every few rounds if the source allows it and the user approved it, and label it before reading the results. Fresh data shows whether rules work on cases that shaped nothing. Add it to Train and Validation only, never to Final, and update the manifest.
 

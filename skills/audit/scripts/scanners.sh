@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Runs whichever audit tools are already installed, saving each result to <outdir>.
+# Tools run at the same time, so "ran" lines come in the order they finish.
 # Installs nothing, but some tools contact their own advisory services or rule registries.
 # Usage: scanners.sh <outdir> [--no-project-code]
 # --no-project-code skips anything a repo can control (project binaries and yarn).
@@ -19,21 +20,24 @@ summary="$out/summary.txt"
 : > "$summary"
 note() { printf '%s\n' "$*" | tee -a "$summary"; }
 
-# run <name> <command...>: audit tools exit non-zero when they find issues, so that isn't a failure.
+# run <name> <command...>: starts the tool in the background. Audit tools exit
+# non-zero when they find issues, so that isn't a failure.
 run() {
-  local name=$1 code; shift
+  local name=$1; shift
   note "started  $name"
-  if command -v perl >/dev/null 2>&1; then
-    perl -e 'alarm shift; exec @ARGV or exit 127' "$limit" "$@" < /dev/null > "$out/$name.txt" 2>&1
-  else
-    "$@" < /dev/null > "$out/$name.txt" 2>&1
-  fi
-  code=$?
-  if [ "$code" = 142 ]; then
-    note "timedout $name after ${limit}s, so treat its checks as Not verified"
-  else
-    note "ran      $name (exit $code, $(wc -l < "$out/$name.txt" | tr -d ' ') lines): $out/$name.txt"
-  fi
+  (
+    if command -v perl >/dev/null 2>&1; then
+      perl -e 'alarm shift; exec @ARGV or exit 127' "$limit" "$@" < /dev/null > "$out/$name.txt" 2>&1
+    else
+      "$@" < /dev/null > "$out/$name.txt" 2>&1
+    fi
+    code=$?
+    if [ "$code" = 142 ]; then
+      note "timedout $name after ${limit}s, so treat its checks as Not verified"
+    else
+      note "ran      $name (exit $code, $(wc -l < "$out/$name.txt" | tr -d ' ') lines): $out/$name.txt"
+    fi
+  ) &
 }
 
 # tool <name> <install hint> <command...>: runs only if the command exists.
@@ -88,7 +92,8 @@ elif [ -f pyproject.toml ]; then
 fi
 if [ -f Cargo.toml ]; then
   found_manifest=1
-  if cargo audit --version >/dev/null 2>&1; then run cargo-audit cargo audit; else note "skipped  cargo-audit (install: cargo install cargo-audit)"; fi
+  # Both take cargo's lock, so a waiting tool could use up its time limit.
+  if cargo audit --version >/dev/null 2>&1; then run cargo-audit cargo audit; wait; else note "skipped  cargo-audit (install: cargo install cargo-audit)"; fi
   if cargo outdated --version >/dev/null 2>&1; then run cargo-outdated cargo outdated --root-deps-only; else note "skipped  cargo-outdated (install: cargo install cargo-outdated)"; fi
 fi
 if [ -f go.mod ]; then
@@ -125,4 +130,5 @@ if [ -f package.json ]; then
   local_bin jscpd "npm i -D jscpd" jscpd . --silent --ignore "**/node_modules/**,**/dist/**,**/build/**,**/.next/**"
 fi
 
+wait
 note "== Done. Full output is in $out =="

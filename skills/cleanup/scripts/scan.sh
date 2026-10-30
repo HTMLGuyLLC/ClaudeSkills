@@ -198,23 +198,34 @@ report_worktree() {
   esac
 }
 
+needs_fetch() {
+  local repo=$1
+  git -C "$repo" worktree list --porcelain 2>/dev/null | grep -q '^bare$' && return 1
+  base_ref "$repo" >/dev/null || return 1
+  git -C "$repo" remote get-url origin >/dev/null 2>&1 &&
+    { [ "$(list_worktrees "$repo" | wc -l)" -gt 1 ] || [ "$(git -C "$repo" for-each-ref --count=2 refs/heads | wc -l)" -gt 1 ]; }
+}
+
+fetch_repo() {
+  local repo=$1 result=failed
+  needs_fetch "$repo" || return 0
+  git -C "$repo" fetch -q --prune origin 2>/dev/null && result=ok
+  printf '%s\t%s\n' "$repo" "$result" >> "$tmp/fetched"
+}
+
 report_repo() {
-  local repo=$1 base fetched=skipped path head branch state primary=true unique checked_out how track name
+  local repo=$1 base fetched path head branch state primary=true unique checked_out how track name
   git -C "$repo" worktree list --porcelain 2>/dev/null | grep -q '^bare$' && return
   base=$(base_ref "$repo") || {
     printf 'repo: %s\nnote: no main branch found, so nothing here can be judged\n\n' "$repo"
     return
   }
-
-  if [ "$fetch" = true ] && git -C "$repo" remote get-url origin >/dev/null 2>&1 &&
-    { [ "$(list_worktrees "$repo" | wc -l)" -gt 1 ] || [ "$(git -C "$repo" for-each-ref --count=2 refs/heads | wc -l)" -gt 1 ]; }; then
-    git -C "$repo" fetch -q --prune origin 2>/dev/null && fetched=ok || fetched=failed
-  fi
+  fetched=$(awk -F'\t' -v r="$repo" '$1 == r { print $2 }' "$tmp/fetched")
 
   if [ -z "$only" ]; then
     echo "repo: $repo"
     echo "base: $base"
-    echo "fetch: $fetched"
+    echo "fetch: ${fetched:-skipped}"
     echo
   fi
 
@@ -280,6 +291,19 @@ done | sort -u > "$tmp/repos"
 if [ ! -s "$tmp/repos" ] && [ -n "$only" ]; then
   printf 'worktree: %s\nclass: unknown\nwhy: not a git worktree\n' "$only"
   exit 0
+fi
+
+# Fetching is most of the wait, so run up to 8 at a time before reporting anything.
+: > "$tmp/fetched"
+if [ "$fetch" = true ]; then
+  started=0
+  while IFS= read -r repo; do
+    [ -n "$repo" ] || continue
+    fetch_repo "$repo" &
+    started=$((started + 1))
+    [ $((started % 8)) -ne 0 ] || wait
+  done < "$tmp/repos"
+  wait
 fi
 
 while IFS= read -r repo; do

@@ -44,7 +44,7 @@ Then take the matching path:
 
 ## Step 2: Study the project
 
-Find every kind of person it serves, using a search agent if the repo is large. Look at:
+Find every kind of person it serves. If the repo is large, split this list across up to 3 search agents in one message. Look at:
 
 - Pricing, plan gates, and feature flags
 - Role and permission checks, account types, and admin or internal pages

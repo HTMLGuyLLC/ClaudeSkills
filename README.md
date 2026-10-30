@@ -17,6 +17,8 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 
 **What it does:** Reviews your code like a team of experts, covering security, speed, accessibility, design, legal, and more. It gives you a clear answer: Ship, Ship after fixes, or Don't ship. It doesn't change your code unless you ask.
 
+**How it stays fast:** Its scanners, your lint, and your tests all run at the same time. For anything over 3 files, several reviewers work side by side, and they share one set of project notes so they don't each repeat the same research. Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 6. More reviewers means more tokens, and it tells you the estimate before it starts. Separate agents also double-check a long list of serious findings, and `--fix` makes unrelated fixes side by side.
+
 **Check what you're working on now:**
 
 ```text
@@ -88,7 +90,7 @@ The first time the `personas` check runs in a project, it uses `/personas` to wo
 
 ### `/loop-audit`
 
-**What it does:** Runs `/audit`, fixes what it finds, and audits again, until only rare, minor issues are left. Anything that needs a human decision goes on a list for you. It doesn't commit unless you ask. This one can use a lot of tokens, and it tells you the worst case before it starts.
+**What it does:** Runs `/audit`, fixes what it finds, and audits again, until only rare, minor issues are left. Anything that needs a human decision goes on a list for you. It doesn't commit unless you ask. This one can use a lot of tokens, and it tells you the worst case before it starts. Each round reuses the first round's project notes, runs your tests while the reviewers read, and makes unrelated fixes side by side.
 
 **Audit and fix your current work:**
 
@@ -132,7 +134,7 @@ The first time the `personas` check runs in a project, it uses `/personas` to wo
 /personas debate would it be useful to add shared budgets
 ```
 
-The personas each give their view alone, argue with each other, then vote on a proposal. You get a recommendation, or an honest "they couldn't agree". The result shows who still disagrees and what a person needs to decide. A full report goes in `.claude/debates/`.
+The personas each give their view alone, argue with each other, then vote on a proposal. You get a recommendation, or an honest "they couldn't agree". The result shows who still disagrees and what a person needs to decide. Everyone reads the same saved fact sheet, which keeps the debate fair and saves tokens. A full report goes in `.claude/debates/`.
 
 **Debate options:**
 
@@ -147,7 +149,7 @@ These debates are simulated by AI from your project's files. They help you think
 
 ### `/release`
 
-**What it does:** Ships your work from start to finish. It commits, opens a PR, waits for tests and reviews, fixes what comes back, merges, and runs your project's release process. If it gets stuck or stops partway, run it again and it picks up where it left off.
+**What it does:** Ships your work from start to finish. It commits, opens a PR, waits for tests and reviews, fixes what comes back, merges, and runs your project's release process. If it gets stuck or stops partway, run it again and it picks up where it left off. When CI fails or reviews come back, it gathers everything at once and fixes it all in one push, because every push restarts CI.
 
 **Ship it:**
 
@@ -182,7 +184,7 @@ You can use `patch`, `minor`, `major`, or an exact version.
 
 ### `/improve-deterministic`
 
-**What it does:** Improves plain code or rules, like a spam filter or a bill categorizer, by testing them against real examples. AI helps while you develop, but the finished logic has no AI in it, so it's cheap and predictable to run. It keeps a change only if the score really improves.
+**What it does:** Improves plain code or rules, like a spam filter or a bill categorizer, by testing them against real examples. AI helps while you develop, but the finished logic has no AI in it, so it's cheap and predictable to run. It keeps a change only if the score really improves. Big labeling jobs run in parallel batches, and unrelated fixes can be tried side by side. Each one is still tested alone before it's kept.
 
 **Improve something:**
 
@@ -206,7 +208,7 @@ Its data stays in a `.improve/` folder that git ignores. That folder may hold pr
 
 ### `/cleanup`
 
-**What it does:** Reviews the git worktrees in every repo Claude has worked in. It removes the ones whose work is merged and that nothing is using, along with merged branches and dead worktree records. It shows you anything unfinished and asks first, and it never touches a worktree that a chat or process is using.
+**What it does:** Reviews the git worktrees in every repo Claude has worked in. It removes the ones whose work is merged and that nothing is using, along with merged branches and dead worktree records. It shows you anything unfinished and asks first, and it never touches a worktree that a chat or process is using. It fetches your repos at the same time, up to 8 at once, to shorten the scan.
 
 **Clean up everything:**
 

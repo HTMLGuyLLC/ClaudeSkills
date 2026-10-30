@@ -185,6 +185,16 @@ printf '#!/bin/sh\nexec sleep 30\n' > "$slow/gitleaks"
 chmod +x "$slow/gitleaks"
 out=$(cd "$s" && PATH="$slow:$PATH" SCANNER_TIMEOUT=1 bash "$scanners" "$work/scan-slow" 2>&1)
 expect "hung tool times out" "timedout gitleaks" "$out"
+# gitleaks finishes only once semgrep, which starts later, has run. In order, it would time out.
+together="$work/togetherbin"
+mkdir -p "$together"
+printf '#!/bin/sh\nuntil [ -e "%s/semgrep-ran" ]; do sleep 0.1; done\n' "$work" > "$together/gitleaks"
+printf '#!/bin/sh\ntouch "%s/semgrep-ran"\n' "$work" > "$together/semgrep"
+chmod +x "$together/gitleaks" "$together/semgrep"
+out=$(cd "$s" && PATH="$together:$PATH" SCANNER_TIMEOUT=5 bash "$scanners" "$work/scan-together" 2>&1)
+expect "tools run at the same time" "ran      gitleaks" "$out"
+reject "no tool waits on another" "timedout" "$out"
+expect "done comes after the tools" "== Done" "$(tail -n 1 "$work/scan-together/summary.txt")"
 out=$(cd "$s" && touch package.json && mkdir -p node_modules/.bin &&
   printf '#!/bin/sh\necho ran > "%s/ran"\n' "$work" > node_modules/.bin/knip &&
   chmod +x node_modules/.bin/knip && bash "$scanners" "$work/scan-safe" --no-project-code 2>&1)
@@ -463,6 +473,17 @@ expect "missing folder refused" "folder not found" "$(rm_tree worktree "$work/no
 expect "not a worktree" "not a git worktree" "$(only "$plain_dir")"
 expect "bad hours rejected" "expects a number" "$(cd "$r" && HOME="$ch" CLEANUP_RECENT_HOURS=x bash "$cleanup_scan" 2>&1)"
 expect "scan finds repos from chats" "repo: $r" "$(chat "$r" true 1 && cd "$work" && HOME="$ch" bash "$cleanup_scan" --no-fetch 2>&1)"
+origin="$work/origin.git"
+git init -q --bare -b main "$origin"
+good=$(new_repo)
+git -C "$good" commit -q --allow-empty -m first && git -C "$good" branch other
+git -C "$good" remote add origin "$origin" && git -C "$good" push -q origin main
+bad=$(new_repo)
+git -C "$bad" commit -q --allow-empty -m first && git -C "$bad" branch other
+git -C "$bad" remote add origin "$work/missing.git"
+out=$(cd "$work" && HOME="$ch" bash "$cleanup_scan" --no-gh "$good" "$bad" 2>&1)
+expect "fetch result matches its repo" "$(printf 'repo: %s\nbase: origin/main\nfetch: ok' "$good")" "$out"
+expect "failed fetch matches its repo" "$(printf 'repo: %s\nbase: main\nfetch: failed' "$bad")" "$out"
 
 # --- install
 home="$work/home"

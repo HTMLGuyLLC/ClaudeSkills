@@ -50,7 +50,7 @@ Find where things stand before doing anything else:
 
 ## 1. Learn the project's process
 
-Read whichever exist: `CONTRIBUTING.md`, `RELEASING.md`, `docs/` pages about releasing, `CLAUDE.md`, `AGENTS.md`, the `justfile`, `Makefile`, or package scripts, `.github/workflows/`, `.changeset/`, `release-please-config.json`, `.goreleaser.yaml`, and the PR template. Then check how it's set up:
+Read whichever exist: `CONTRIBUTING.md`, `RELEASING.md`, `docs/` pages about releasing, `CLAUDE.md`, `AGENTS.md`, the `justfile`, `Makefile`, or package scripts, `.github/workflows/`, `.changeset/`, `release-please-config.json`, `.goreleaser.yaml`, and the PR template. Then check how it's set up. Send the reads and these commands in one message:
 
 ```bash
 gh repo view --json nameWithOwner,defaultBranchRef,squashMergeAllowed,mergeCommitAllowed,rebaseMergeAllowed,deleteBranchOnMerge
@@ -66,7 +66,7 @@ Skip what's already done.
 
 1. On the default branch, create a branch using the repo's naming style.
 2. Follow project rules that apply before a PR, such as adding a changelog line.
-3. Run the lint and tests covering the change. If the project has no CI, run the full suite, because nothing else will. Fixing a failure here is much cheaper than a CI round.
+3. Run the lint and tests covering the change, in one message if they can run side by side. If the project has no CI, run the full suite, because nothing else will. Fixing a failure here is much cheaper than a CI round.
 4. Stage only the files belonging to this work, and commit with an explicit pathspec. Confirm with `git diff --cached --stat` first.
 5. Push the branch.
 
@@ -115,7 +115,7 @@ The way to wait depends on where this runs.
 
 ## 5. Fix what comes back
 
-Handle everything at once, then push once. Each push restarts CI.
+Handle everything at once, then push once. Each push restarts CI. Fetch every failed log and every comment author's permission in one message, so you can see all of it before changing anything.
 
 **CI failures:** read the log with `gh run view <id> --log-failed`, then fix the cause. If a failure looks flaky and is unrelated to this change, rerun it once with `gh run rerun <id> --failed`. Note the flaky test in the final report.
 
@@ -133,7 +133,7 @@ Act only on comments from people with write access and from review bots the repo
 - Wrong or doesn't apply, from a bot: reply with the reason, then resolve the thread.
 - Wrong or doesn't apply, from a person, or needs a decision: stop and ask. Leave the thread unresolved, since only they should close it.
 
-Resolve threads using the ids from `pr-state.sh`:
+Resolve threads using the ids from `pr-state.sh`, sending them all in one message:
 
 ```bash
 gh api graphql -f query='mutation($id: ID!) { resolveReviewThread(input: {threadId: $id}) { thread { isResolved } } }' -f id=<thread id>
