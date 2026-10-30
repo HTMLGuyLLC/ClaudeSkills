@@ -1,9 +1,10 @@
 ---
 name: personas
-description: Finds, creates, and maintains a project's personas, covering customers, situations, and the internal team who support them. Reuses personas already written in AGENTS.md, docs, or anywhere else, checks them for gaps, and saves the approved list to .claude/personas.md so /audit and other work stop inventing new ones. Use whenever the user says "/personas", "generate personas", "who uses this", "user types", or wants to add or change a persona.
-argument-hint: "[personas or roles to add] [--no-ask]"
+description: Finds, creates, and maintains a project's personas, covering customers, situations, and the internal team who support them. Reuses personas already written in AGENTS.md, docs, or anywhere else, checks them for gaps, and saves the approved list to .claude/personas.md so /audit and other work stop inventing new ones. Also runs structured debates between personas that end in a consensus or an honest split. Use whenever the user says "/personas", "generate personas", "who uses this", "user types", wants to add or change a persona, or asks the personas to debate or weigh in on a product decision.
+argument-hint: "[debate <question> [--with names] [--quick]] [personas or roles to add] [--no-ask]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/find.sh *)
+  - Bash(${CLAUDE_SKILL_DIR}/scripts/debate-path.sh *)
 ---
 
 # Personas
@@ -12,7 +13,9 @@ Build one list of the people who use and support this project, then keep it wher
 
 **Arguments:** $ARGUMENTS
 
-Anything besides `--no-ask` is a persona, role, or change the user wants. `--no-ask` means nobody can answer right now, so nothing gets saved.
+If the first word is `debate`, read `${CLAUDE_SKILL_DIR}/references/debate.md` and follow it. The script it names is `${CLAUDE_SKILL_DIR}/scripts/debate-path.sh`.
+
+Otherwise, anything besides `--no-ask` is a persona, role, or change the user wants. `--no-ask` means nobody can answer right now, so nothing gets saved.
 
 ## Rules
 

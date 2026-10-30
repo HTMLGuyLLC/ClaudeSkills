@@ -8,6 +8,7 @@ pr_state="$repo/skills/release/scripts/pr-state.sh"
 scope="$repo/skills/audit/scripts/scope.sh"
 scanners="$repo/skills/audit/scripts/scanners.sh"
 find_personas="$repo/skills/personas/scripts/find.sh"
+debate_path="$repo/skills/personas/scripts/debate-path.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 failures=0
@@ -229,6 +230,29 @@ printf 'persona\n' > "$plain_dir/node_modules/a.md"
 out=$(cd "$plain_dir" && bash "$find_personas" 2>&1)
 expect "works outside git" "notes.md:1:" "$out"
 reject "skips dependencies outside git" "node_modules" "$out"
+
+# --- personas: debate report paths
+d=$(new_repo)
+mkdir -p "$d/sub"
+today=$(date +%F)
+out=$(cd "$d/sub" && bash "$debate_path" 'What goes on the Bills page?' 2>&1)
+expect "debate path from a subfolder" ".claude/debates/$today-what-goes-on-the-bills-page.md" "$out"
+[ -f "$out" ] && pass || fail "debate path should be reserved"
+expect "debate reports stay out of git" ".claude/debates/" "$(cat "$d/.git/info/exclude")"
+out=$(cd "$d" && bash "$debate_path" 'What goes on the Bills page?' 2>&1)
+expect "debate never reuses a name" "bills-page-2.md" "$out"
+(cd "$d" && bash "$debate_path" one >/dev/null && bash "$debate_path" two >/dev/null)
+[ "$(grep -cxF '.claude/debates/' "$d/.git/info/exclude")" = 1 ] && pass || fail "exclude line should appear once"
+out=$(cd "$d" && bash "$debate_path" '../../etc/passwd' 2>&1)
+expect "debate path can't escape" ".claude/debates/$today-etc-passwd.md" "$out"
+out=$(cd "$d" && bash "$debate_path" 2>&1)
+expect "debate with no topic" "$today-debate.md" "$out"
+out=$(cd "$d" && bash "$debate_path" "$(printf 'x%.0s' {1..80})" 2>&1)
+expect "long topic is cut" "$today-$(printf 'x%.0s' {1..50}).md" "$out"
+printf '## Personas\n' > "$d/.claude/debates/old.md"
+reject "find skips debates" ".claude/debates" "$(cd "$d" && bash "$find_personas" 2>&1)"
+out=$(cd "$plain_dir" && bash "$debate_path" topic 2>&1)
+expect "debate path works outside git" ".claude/debates/$today-topic.md" "$out"
 
 # --- install
 home="$work/home"

@@ -6,7 +6,7 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 |---|---|
 | [`audit`](skills/audit/SKILL.md) | Audits changes for security, performance, resilience, accessibility, legal, consistency, personas, and more. Run part of it with a lens or bundle, like `/audit personas` or `/audit protect` |
 | [`loop-audit`](skills/loop-audit/SKILL.md) | Runs `audit`, fixes what it finds, and repeats until only rare low-priority edge cases remain |
-| [`personas`](skills/personas/SKILL.md) | Finds or creates a project's customer, situation, and team personas, checks them for gaps, and saves the approved list to `.claude/personas.md`. `audit` uses that list and runs this the first time a project has none |
+| [`personas`](skills/personas/SKILL.md) | Finds or creates a project's customer, situation, and team personas, checks them for gaps, and saves the approved list to `.claude/personas.md`. `audit` uses that list and runs this the first time a project has none. `/personas debate <question>` makes them argue a product decision and reports a consensus or an honest split |
 | [`release`](skills/release/SKILL.md) | Commits, opens a PR, waits for CI and reviews, fixes what comes back, merges, and runs the project's release process |
 | [`improve-deterministic`](skills/improve-deterministic/SKILL.md) | Uses AI to test and refine deterministic logic against real data, so the app doesn't need AI at runtime. Keeps test data and your corrections in a git-ignored `.improve/` folder in each project |
 

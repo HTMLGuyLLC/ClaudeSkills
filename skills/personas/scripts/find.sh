@@ -42,7 +42,7 @@ count=0
 while IFS= read -r -d '' file; do
   file=${file#./}
   case "$file" in
-    "$saved" | .claude/audits/* | *changelog*) continue ;;
+    "$saved" | .claude/audits/* | .claude/debates/* | *changelog*) continue ;;
     *.md | *.mdx | *.markdown | *.txt | *.rst | *.adoc) ;;
     *) continue ;;
   esac
