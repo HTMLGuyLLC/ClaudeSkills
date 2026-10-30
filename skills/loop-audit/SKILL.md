@@ -1,7 +1,7 @@
 ---
 name: loop-audit
 description: Repeatedly runs /audit, fixes what it finds, and audits again until only rare, low-priority edge cases remain. Only runs when typed as /loop-audit.
-argument-hint: "[audit scope] [lens,lens] [--max n]"
+argument-hint: "[audit scope] [lens or bundle,...] [--max n]"
 disable-model-invocation: true
 ---
 

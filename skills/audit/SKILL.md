@@ -1,7 +1,7 @@
 ---
 name: audit
 description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance, resilience, error handling, logging, alerting, analytics, accessibility, best practices, tests, simplicity, innovation, AI cost, code quality, legal, docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
-argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens,lens] [--quick] [--fix]"
+argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens or bundle,...] [--quick] [--fix]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scope.sh *)
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scanners.sh *)
@@ -51,13 +51,26 @@ Check a set of changes against every lens in the table below, then report only v
 | 6 | `plans` | Plan gating, billing, upgrade and downgrade paths | same |
 | 6 | `innovation` | AI or new technology that makes it feel slick | same |
 
+### Bundles
+
+A bundle is a shortcut for one group's lenses. Bundles and lenses can be combined, as in `/audit protect,personas`.
+
+| Bundle | Lenses |
+|---|---|
+| `protect` | `security`, `legal` |
+| `reliability` | `performance`, `resilience`, `errors`, `data` |
+| `observability` | `logging`, `alerting`, `analytics`, `tests` |
+| `engineering` | `practices`, `quality`, `cost`, `delivery` |
+| `experience` | `a11y`, `simplicity`, `consistency`, `docs`, `ux` |
+| `product` | `personas`, `plans`, `innovation` |
+
 ## Step 1: Resolve the scope
 
 ```bash
 ${CLAUDE_SKILL_DIR}/scripts/scope.sh <scope arguments>
 ```
 
-Pass only the scope part of the arguments. Lens names and flags stay out. A word matching a lens id is a lens, unless it contains a `/`, so use `docs/` for a folder named `docs`. With no scope, `auto` picks the first that exists: uncommitted changes, branch commits ahead of the base, the latest PR, the last commit. For a request in plain words ("the checkout flow", "everything since Tuesday"), translate it into a path or range yourself.
+Pass only the scope part of the arguments. Lens names, bundle names, and flags stay out. A word matching a lens id or bundle is a selection, unless it contains a `/`, so use `docs/` for a folder named `docs`. With no scope, `auto` picks the first that exists: uncommitted changes, branch commits ahead of the base, the latest PR, the last commit. For a request in plain words ("the checkout flow", "everything since Tuesday"), translate it into a path or range yourself.
 
 The output gives `mode`, `label`, `diff_cmd`, and the file list. If it prints `also_ahead`, say the audit covers only the uncommitted work and that those commits weren't included. Repeat any `note:` lines in the report.
 
@@ -91,7 +104,7 @@ Also run the project's own lint, type check, and the tests covering the scope if
 
 ## Step 4: Decide which lenses apply
 
-Select lenses from the arguments if given, otherwise all of them. Mark a lens N/A only for a concrete reason, such as "`a11y`: no UI in this repo" or "PCI: no card handling; payments go through Stripe Checkout." `security`, `consistency`, and `docs` are rarely N/A, because small text changes can still leak a secret, break a term, or make docs stale.
+Select lenses and bundles from the arguments if given, otherwise all of them. The report lists only the selected lenses, and says the rest weren't run. Mark a lens N/A only for a concrete reason, such as "`a11y`: no UI in this repo" or "PCI: no card handling; payments go through Stripe Checkout." `security`, `consistency`, and `docs` are rarely N/A, because small text changes can still leak a secret, break a term, or make docs stale.
 
 ## Step 5: Review
 
@@ -102,6 +115,7 @@ Select lenses from the arguments if given, otherwise all of them. Mark a lens N/
 | Up to 5 files | 1, covering all applicable lenses |
 | Up to 30 files | 3: groups 1 and 2, groups 3 and 4, groups 5 and 6 |
 | Larger, or `all` | 1 per group with applicable lenses |
+| Any size, with lenses or bundles selected | No more than 1 per group selected |
 
 **Standard:** spawn the agents all in the same message, using the Opus model because this is judgment work. If an agent fails or is blocked, don't resend the same request. Mark its lenses Not verified, or review them yourself and say that review wasn't independent. Give each agent this brief, filled in:
 

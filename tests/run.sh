@@ -216,5 +216,14 @@ for skill in release loop-audit improve-deterministic; do
   grep -q '^disable-model-invocation: true$' "$repo/skills/$skill/SKILL.md" && pass || fail "$skill: must be typed to run"
 done
 
+# --- Audit bundles cover every lens exactly once, and never reuse a lens id
+audit_skill="$repo/skills/audit/SKILL.md"
+lenses=$(grep -E '^\| [1-6] \| `' "$audit_skill" | cut -d'`' -f2 | sort)
+bundle_rows=$(sed -n '/^### Bundles/,/^## /p' "$audit_skill" | grep '^| `')
+bundled=$(printf '%s\n' "$bundle_rows" | cut -d'|' -f3 | grep -oE '`[a-z0-9]+`' | tr -d '`' | sort)
+bundles=$(printf '%s\n' "$bundle_rows" | cut -d'`' -f2 | sort)
+[ -n "$lenses" ] && [ "$lenses" = "$bundled" ] && pass || fail "bundles must cover every lens exactly once"
+[ -z "$(comm -12 <(printf '%s\n' "$lenses") <(printf '%s\n' "$bundles"))" ] && pass || fail "bundle name reuses a lens id"
+
 echo "$((total - failures))/$total passed"
 [ "$failures" = 0 ]
