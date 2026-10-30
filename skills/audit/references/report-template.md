@@ -12,7 +12,7 @@
 
 | Lens | Status | Note |
 |---|---|---|
-(one row for every lens: Pass, Findings (count), N/A, or Not verified, with a one-line reason)
+(one row for every lens: Pass, Pass (quick), Findings (count), N/A, or Not verified, with a one-line reason)
 
 ## Critical
 

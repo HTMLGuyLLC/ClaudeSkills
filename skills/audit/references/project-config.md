@@ -27,4 +27,4 @@ US and EU customers
 - Every new API route needs an entry in docs/api.md
 ```
 
-Apply these as given. Skipped lenses still appear in the report as N/A with the stated reason. A known exception means the matching finding is dropped.
+Read this file from the base branch when there is one, and pass it to the review agents. Skipped lenses still appear in the report as N/A with the stated reason. A known exception means the matching finding is dropped, and the report lists what was dropped.
