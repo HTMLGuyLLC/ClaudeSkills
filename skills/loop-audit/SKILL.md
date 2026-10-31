@@ -92,7 +92,7 @@ Keep using the ledger's `Audit dir`, and redo audit Step 2 only if a fix changed
 Put every finding in one bucket:
 
 - **Fix:** every Critical, High, and Medium, unless it belongs in Needs you. Also any Low that's cheap to fix (effort S) and isn't a rare edge case.
-- **Needs you:** a person has to act or decide. This covers rotating leaked secrets or anything outside the repo, wording of legal text, pricing or plan changes, product or design choices with no clear answer, major dependency upgrades with breaking changes, migrations that destroy or rewrite data, and new designs for auth, sessions, payments, or schema when the repo has no pattern to follow. Don't invent a security design to clear a finding.
+- **Needs you:** a person has to act or decide. This covers rotating leaked secrets or anything outside the repo, including admin panel updates in another project, wording of legal text, pricing or plan changes, product or design choices with no clear answer, major dependency upgrades with breaking changes, migrations that destroy or rewrite data, and new designs for auth, sessions, payments, or schema when the repo has no pattern to follow. Don't invent a security design to clear a finding.
 - **Rare edge case:** Low severity, and it needs unusual conditions or barely matters when it happens. Write down the condition. If you can't name one, it isn't rare.
 - **Left open:** a Low that isn't rare and isn't cheap to fix. Keep it in Open, and list it in the final report.
 - **Dismissed:** verification showed it's wrong or already handled.

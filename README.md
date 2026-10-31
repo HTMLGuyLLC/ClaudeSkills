@@ -29,7 +29,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | `/audit src/checkout` | One folder |
 | `/audit all` | The whole repo |
 
-**Choose which topics to check.** It runs all 23 unless you pick some. The list below shows what each one covers.
+**Choose which topics to check.** It runs all 24 unless you pick some. The list below shows what each one covers.
 
 | Command | What it runs |
 |---|---|
@@ -321,6 +321,18 @@ Judging how things look needs a running app or screenshots.
 - **Gaps:** it suggests any kind of user the list is missing.
 
 These are informed walkthroughs, not real user research.
+
+</details>
+
+<details>
+<summary><code>admin</code>: Can your team handle this change from the admin panel?</summary>
+
+- **Coverage:** for anything that changes for a customer, staff can see it, handle it, and put it right without a developer.
+- **Finding things:** new statuses and fields appear in admin lists, search, and filters, and don't break existing pages.
+- **Safety:** staff actions check their role, confirm before anything destructive, and are logged. Passwords, card numbers, and private content stay hidden.
+- **Admin panel in this project:** a normal finding, and `--fix` updates it.
+- **Admin panel in another project:** a reminder listing exactly what's needed, so you don't forget. `--fix` never touches it, but you can tell the audit to make the change if it can reach that project, or take the brief there yourself.
+- **Can't find one:** it asks you where it is, and can save the answer in `.claude/audit.md`.
 
 </details>
 

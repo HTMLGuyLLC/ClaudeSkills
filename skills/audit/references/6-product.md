@@ -1,4 +1,4 @@
-# Group 6: Personas, plans, innovation
+# Group 6: Personas, admin, plans, innovation
 
 ## personas
 
@@ -11,6 +11,32 @@ Use a representative 4 to 8 personas for an ordinary change, and all that fit fo
 **For each persona, report:** their goal, the path they took, what worked, and where they got stuck, were confused, or felt let down. Findings must point to actual behavior in code or copy. Don't invent user opinions or claim research that didn't happen. These are informed walkthroughs, not user testing.
 
 **Spot gaps.** If the code shows a kind of user nobody on the list covers, such as a new role or plan, return it as a suggested persona with the evidence. A suggestion isn't a finding.
+
+## admin
+
+Anything that changes for a customer should also be something the team can handle from the admin panel. If it isn't, the first support ticket about it needs a developer and a database query, or leaves the customer stuck.
+
+**Find what changed for customers:** new or changed data, settings, account or subscription states, permissions, limits, plans, credits, and actions. For each one, ask whether staff can do these from the admin panel:
+- **See it:** the current value or status for one customer, without querying the database.
+- **Handle it:** what support will need, such as change, reset, retry, grant, cancel, refund, or turn on and off for that customer.
+- **Recover it:** put things right when this gets stuck or goes wrong.
+- **Find it:** new statuses and fields appear in admin lists, search, and filters. A new value doesn't show blank or crash an existing admin page.
+- **Do it safely:** actions check the staff member's role on the server, confirm before anything destructive, and write to the audit log.
+
+**Find the admin panel.** Check the `## Admin panel` section of `.claude/audit.md`, then the project's docs, then search the repo for admin routes, apps, back-office tools, and framework admin setups. Then treat the result as one of these:
+
+| Where it is | What to do |
+|---|---|
+| In this project | Report a normal finding, with the admin code to change. Use `file:line` of the closest admin page or route |
+| In another project or tool | Return a finding marked `Elsewhere`. It's a reminder for the user, not a defect in this code. Don't read or change that project |
+| Can't tell | Mark the lens Not verified, and say the user should be asked where it is |
+| Confirmed there isn't one | Mark the lens N/A if `.claude/audit.md` says so with a reason. Otherwise, report one Idea if support clearly needs a panel |
+
+**Write an `Elsewhere` finding so someone new can act on it:** what changed for customers, what the admin panel needs to show or do, the fields, API, or migration it depends on, and whether it has to ship before or after this change.
+
+**Severity:** usually Medium. Use High when a problem with a customer's money or access can't be solved without a developer.
+
+**Don't flag:** changes customers can't notice, or preferences support would never touch. Don't ask for edit controls where a read-only view is safer. Staff should never see passwords or full card numbers, and private customer content should stay hidden unless the product has a clear reason and a logged way to access it.
 
 ## plans
 

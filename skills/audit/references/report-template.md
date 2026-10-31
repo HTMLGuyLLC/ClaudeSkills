@@ -47,6 +47,12 @@
 ## Suggested personas
 - **<Persona>:** not saved yet, or the evidence that nobody on the list covers them.
 
+## Admin panel updates
+
+| Project | What changed for customers | What the admin panel needs | Depends on | Ship order | Status |
+|---|---|---|---|---|---|
+(one row per update needed in another project; Status: Needs you, Done, or Not needed)
+
 ## Ideas
 - **<Idea>:** benefit, effort, running cost.
 
@@ -59,4 +65,4 @@
 (what ran, what was skipped, and what to install)
 ```
 
-Omit empty severity sections, but always keep Lens coverage and Not verified.
+Omit empty severity sections and an empty Admin panel updates section, but always keep Lens coverage and Not verified.
