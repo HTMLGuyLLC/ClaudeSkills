@@ -72,9 +72,10 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 - **Described as the result:** behind-the-scenes work that users really feel is written as what they notice, like "Reports load twice as fast", not how it was done.
 - **Actually available:** nothing unreleased, reverted, or hidden behind a flag for this audience. An entry doesn't mention anything that never reached them.
 - **Plain and safe:** no internal names, ticket numbers, or commit hashes, and no security details that help an attacker. Say what to do if users must act.
+- **Security fixes:** routine patches stay out, because readers can't see them and the details can help attackers. List one only if it was serious, users were confirmed affected, or users must act, such as by changing a password or rotating a key. Say what users need to know, not how the flaw worked. A changelog never replaces a notice the law or a contract requires, so flag any possible notice for a person to decide.
 - **Generated changelogs:** if entries come from commits or PR titles, flag the process as well as the entries, so the same leak doesn't return.
 
-**Don't flag:** a developer changelog whose readers use the code or API, such as a library's `CHANGELOG.md`. Internal changes that affect those readers belong there.
+**Don't flag:** a developer changelog whose readers use the code or API, such as a library's `CHANGELOG.md`. Internal changes that affect those readers belong there, and so do security fixes, because they need to know which versions to upgrade.
 
 ## ux
 

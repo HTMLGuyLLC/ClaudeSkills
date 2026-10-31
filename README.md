@@ -304,7 +304,7 @@ Contrast and focus order need a running app to confirm.
 - **Developer docs:** API docs, SDK examples, and settings references.
 - **Marketing:** the blog, feature lists, pricing, and emails.
 - **Outside the repo:** anything it can't reach is listed for you to update.
-- **Changelogs:** each public changelog or What's new shows only what its readers can see or experience. Admin and marketing site updates stay out of customer changelogs, and so do refactors and other behind-the-scenes work. Developer changelogs for libraries and APIs are exempt.
+- **Changelogs:** each public changelog or What's new shows only what its readers can see or experience. Admin and marketing site updates stay out of customer changelogs, and so do refactors and other behind-the-scenes work. Routine security patches stay out too, unless the issue was serious, users were affected, or they need to act. Developer changelogs for libraries and APIs are exempt.
 
 </details>
 
