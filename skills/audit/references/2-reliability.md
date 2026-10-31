@@ -27,8 +27,27 @@ Well-built code can still do the wrong thing. This lens asks whether the change 
 
 ## performance
 
+**Lighthouse and Core Web Vitals**
+
+Run Lighthouse on the key pages, on mobile and desktop, and report the real numbers with the page and device. Use a production build, because dev server numbers mislead. Take the median of at least 3 runs. If it can't run, use the browser's tools, or mark the numbers Not verified and review the code only.
+
+| Metric | What it measures | Target |
+|---|---|---|
+| LCP | When the main content appears | Under 2.5s |
+| INP | How fast the page responds to input | Under 200ms |
+| CLS | How much the layout jumps | Under 0.1 |
+| TTFB | When the server starts responding | Under 0.8s |
+| FCP | When anything first appears | Under 1.8s |
+| TBT | How long the page is blocked from responding | Under 200ms |
+| Lighthouse scores | Performance, Accessibility, Best Practices, SEO | 90 or higher |
+
+- Confirm these thresholds are current, since they change over time.
+- INP needs real interaction, so a Lighthouse run uses TBT as a stand-in. Prefer real-user data, such as Chrome UX Report or the project's own monitoring, when it exists.
+- Trace each missed target to its cause, rather than only reporting the score.
+- Where performance matters, budgets run in CI, such as with Lighthouse CI.
+
 **Page load**
-- Core Web Vitals targets: LCP under 2.5s, INP under 200ms, CLS under 0.1. Measure with Lighthouse or the browser if the app can run; otherwise mark the numbers Not verified and review code only.
+- Server response: slow queries, cold starts, redirect chains, and missing CDN or edge caching.
 - Bundle size, code splitting, unused or heavy dependencies, render-blocking scripts, third-party tags.
 - Images and fonts: modern formats, sizes, lazy loading, `font-display`.
 - Server rendering, static generation, and caching used where the framework supports them.

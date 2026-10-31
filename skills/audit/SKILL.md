@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers whether it does what was asked, security, privacy, legal (including whether policies and public claims are still true), performance, resilience, migrations and seeds, operations, logging, alerting, tracing, analytics, tests, code quality, leftovers, AI safety and cost, compatibility, accessibility, UI/UX, docs, consistency, APIs, MCP servers, CLIs and SDKs, notifications, admin panel coverage, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
+description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers whether it does what was asked, security, privacy, legal (including whether policies and public claims are still true), performance, resilience, migrations and seeds, operations, logging, alerting, tracing, analytics, tests, code quality, leftovers, AI safety and cost, compatibility, accessibility, UI/UX, Lighthouse, SEO and AI search, docs, consistency, APIs, MCP servers, CLIs and SDKs, notifications, admin panel coverage, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
 argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens or bundle,...] [--quick] [--fix]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scope.sh *)
@@ -32,7 +32,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 1 | `privacy` | Collecting less, containing personal data, staff access, retention, and user control | same |
 | 1 | `legal` | Terms and privacy accuracy, every public claim, disclaimers, regional obligations, licenses | same |
 | 2 | `correctness` | Does what was asked, business rules, math, boundaries, dates | `references/2-reliability.md` |
-| 2 | `performance` | Page load, perceived speed, query optimization, parallel calls, caching | same |
+| 2 | `performance` | Lighthouse and Core Web Vitals, page load, perceived speed, query optimization, parallel calls, caching | same |
 | 2 | `resilience` | Retries, backoff, try/catch, timeouts, scaling | same |
 | 2 | `errors` | Proactive error handling and user-facing failure | same |
 | 2 | `data` | Integrity, transactions and rollback, concurrency, idempotency, versioning and merging | same |
@@ -53,7 +53,8 @@ Check a set of changes against every lens in the table below, then report only v
 | 5 | `simplicity` | Plain words, fast setup, clone-and-run local setup, progressive depth | same |
 | 5 | `consistency` | Verbiage, design, architecture, ideals | same |
 | 5 | `docs` | README, markdown, help center, blog, changelog, and whether each public changelog fits its audience | same |
-| 5 | `ux` | Attention, CTAs, light and dark mode, mobile, UI states, i18n, SEO | same |
+| 5 | `ux` | Attention, CTAs, light and dark mode, mobile, UI states, i18n | same |
+| 5 | `seo` | Search engines and AI assistants can find, understand, and cite public pages | same |
 | 6 | `personas` | Walkthroughs as each customer type | `references/6-product.md` |
 | 6 | `admin` | Customer changes can be seen and handled from the admin panel, here or in another project | same |
 | 6 | `plans` | Plan gating, billing, upgrade and downgrade paths | same |
@@ -72,7 +73,7 @@ A bundle is a shortcut for one group's lenses. Bundles and lenses can be combine
 | `reliability` | `correctness`, `performance`, `resilience`, `errors`, `data`, `migrations`, `operations` |
 | `observability` | `logging`, `alerting`, `tracing`, `analytics`, `tests` |
 | `engineering` | `practices`, `quality`, `leftovers`, `cost`, `delivery` |
-| `experience` | `a11y`, `compatibility`, `simplicity`, `consistency`, `docs`, `ux` |
+| `experience` | `a11y`, `compatibility`, `simplicity`, `consistency`, `docs`, `ux`, `seo` |
 | `product` | `personas`, `admin`, `plans`, `ai`, `notifications`, `api`, `innovation` |
 
 ## Step 1: Resolve the scope
@@ -112,7 +113,7 @@ For code the user didn't write, such as someone else's PR, add `--no-project-cod
 
 If no scanner reported on dependency versions, compare the direct dependencies with the registry yourself (`npm view <package> version`, or the web for other ecosystems). This applies in `--quick` too. Known vulnerabilities stay Not verified if nothing could check them.
 
-Also run the project's own lint, type check, and the tests covering the scope if the commands are clear from its manifest. Start them as separate background commands alongside the scanners, and save their output to `<audit-dir>`. If a dev server config exists and the scope touches UI, use it for real page-load, perceived-speed, and accessibility measurements, and for the `ux` screenshots, following the "How to check" lines in `references/2-reliability.md` and `references/5-experience.md`. Do this before Step 5 and save the results to `<audit-dir>`, because parallel agents can't share one browser. Run the tests after the server stops if they use the same port or database. A lens that needs one of these and didn't get it is Not verified.
+Also run the project's own lint, type check, and the tests covering the scope if the commands are clear from its manifest. Start them as separate background commands alongside the scanners, and save their output to `<audit-dir>`. If a dev server config exists and the scope touches UI, use it for real page-load, perceived-speed, and accessibility measurements, and for the `ux` screenshots, following the "How to check" lines in `references/2-reliability.md` and `references/5-experience.md`. Run Lighthouse on the key pages if it's installed, and save its results for `performance`, `a11y`, and `seo`. Use a production build for those numbers if one can be made. Do this before Step 5 and save the results to `<audit-dir>`, because parallel agents can't share one browser. Run the tests after the server stops if they use the same port or database. A lens that needs one of these and didn't get it is Not verified.
 
 ## Step 4: Decide which lenses apply
 

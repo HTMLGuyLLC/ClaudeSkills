@@ -29,7 +29,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | `/audit src/checkout` | One folder |
 | `/audit all` | The whole repo |
 
-**Choose which topics to check.** It runs all 33 unless you pick some. The list below shows what each one covers.
+**Choose which topics to check.** It runs all 34 unless you pick some. The list below shows what each one covers.
 
 | Command | What it runs |
 |---|---|
@@ -115,9 +115,9 @@ Every topic gets a result, so nothing is skipped silently. Click one to see what
 <details>
 <summary><code>performance</code>: Is it fast, and does it feel fast when it can't be?</summary>
 
-- **Page load:** Core Web Vitals, bundle size, images, fonts, and third-party scripts.
-- **Queries:** N+1 queries, missing indexes, and results with no limit.
-- **Parallel work:** calls that could run together, and fan-outs that need a limit.
+- **Lighthouse:** real runs on key pages, on mobile and desktop, reporting LCP, INP, CLS, TTFB, FCP, TBT, and scores against set targets. Each miss is traced to its cause.
+- **Page load:** server response, bundle size, images, fonts, and third-party scripts.
+- **Queries and parallel work:** N+1 queries, missing indexes, results with no limit, calls that could run together, and fan-outs that need a limit.
 - **Caching and background work:** the right cache, and slow work moved off the request.
 - **How waits feel:** a like responds right away, a feed shows its layout first, a photo shows a blurred preview, a progress bar finishes fast, a file uploads while you write the caption, and a long search shows what it's doing.
 - **Honesty:** a fake count, or a success message for something that failed, is reported as a problem.
@@ -381,9 +381,23 @@ Proving it works needs a run on your oldest targets, and anything that wasn't ru
 - **Layout and states:** clear hierarchy, few choices at once, people always know where they are, and loading, empty, error, and offline states plus first-time use are all designed.
 - **Light and dark mode:** both are designed, including logos, charts, and emails, with no flash of the wrong theme.
 - **Mobile:** every width from 320 up, thumb reach, no hover-only features, and forms that work with the on-screen keyboard.
-- **Translation and SEO:** text, dates, and layouts work in each language you support, and public pages are readable by search engines and share well.
+- **Translation:** text, dates, and layouts work in each language you support.
 
 Judging how things look needs a running app or screenshots.
+
+</details>
+
+<details>
+<summary><code>seo</code>: Can search engines and AI assistants find and cite you?</summary>
+
+- **Find and read:** important content is in the HTML the server sends, because many AI crawlers don't run JavaScript. Also `robots.txt`, sitemaps, canonical URLs, redirects, and accidental `noindex`.
+- **AI crawlers:** allowing or blocking them is a deliberate choice, and bot protection doesn't quietly hide your site from AI answers.
+- **Understand:** unique titles and headings, valid structured data, alt text, share previews, and `hreflang`.
+- **Worth citing:** pages answer real questions directly, with specific facts that match across your site, docs, and listings.
+- **Measured:** search tools are set up, and someone checks what AI assistants say about the product.
+- **Fair play:** keyword stuffing, hidden text, and tricks aimed at AI tools are reported as problems.
+
+Rankings and AI citations can't be proven from code, so they're marked Not verified.
 
 </details>
 
@@ -659,6 +673,12 @@ brew install gitleaks osv-scanner semgrep shellcheck
 ```
 
 Without Homebrew, see each tool's install page.
+
+`/audit` also runs Lighthouse on your pages if it's installed and your app can run:
+
+```bash
+npm install -g lighthouse
+```
 
 ## Add a skill
 

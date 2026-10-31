@@ -1,4 +1,4 @@
-# Group 5: Accessibility, compatibility, simplicity, consistency, docs, UX
+# Group 5: Accessibility, compatibility, simplicity, consistency, docs, UX, SEO
 
 ## a11y
 
@@ -198,11 +198,45 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 - Emails, errors, PDFs, and legal pages are covered too, with a sensible fallback language.
 - The language can be chosen and is remembered, rather than being guessed from location alone.
 
-**SEO and sharing** (public pages)
-- Each page has its own title, description, and one main heading.
-- Search engines can read it: real content without waiting on JavaScript, a correct `robots.txt` and sitemap, canonical URLs, and no accidental `noindex`. Staging stays out of search.
-- Structured data matches what's on the page, and shared links show a good preview with an Open Graph image.
-- URLs are readable, moved pages redirect, and missing pages return a real 404.
-- Internal links reach every important page, and translated pages use `hreflang`.
+**SEO and sharing:** covered by `seo`.
 
 **How to check:** run the app and take screenshots of each key page at the widths above, in both themes, then judge what you see. Look at the page before reading its code, so the code doesn't tell you what you're supposed to see. Attention, hierarchy, theme, and layout can't be proven from code, so mark them Not verified without a running app or screenshots. Give each finding the page, width, and theme where it shows up.
+
+## seo
+
+Mark this N/A if the product has no public pages. This lens asks whether search engines and AI assistants can find your pages, understand them, and recommend or cite them. Speed is measured by `performance`, and it matters here too.
+
+**They can find and read it**
+- Important content is in the HTML the server sends. Many AI crawlers don't run JavaScript, so a page that depends on it can look empty to them.
+- `robots.txt`, the sitemap, and canonical URLs are correct, with no accidental `noindex`. Staging stays out of search.
+- URLs are readable, moved pages redirect, and missing pages return a real 404.
+- Internal links reach every important page.
+
+**AI crawlers are a decision**
+- `robots.txt` deliberately allows or blocks AI crawlers. Many companies run separate crawlers for training, for search, and for fetching pages a user asks about, so a site can block one and allow another. Check current crawler names.
+- A blanket block can hide the site from AI answers. Bot protection or a CDN rule can do the same without anyone noticing, so check for that too.
+
+**They can understand it**
+- Each page has its own title, description, and one main heading, with headings in a clear order.
+- Structured data is valid and matches what's on the page.
+- Images have useful alt text, and shared links show a good preview with an Open Graph image.
+- Translated pages use `hreflang`.
+
+**The content is worth citing**
+- Each important page answers a real question, with no thin pages or duplicates competing for the same search.
+- Pages lead with a direct answer, in clear statements that make sense when quoted alone, backed by specific facts, dates, and sources.
+- Prices, features, and limits are in plain text, not locked in images or behind a login.
+- The same facts match across the site, docs, and listings, so AI tools don't repeat conflicting answers.
+- Trust signals are clear: who wrote it, when it was last updated, and who runs the company.
+
+**Measured**
+- Search Console or similar is set up, and analytics can show traffic from search and AI tools.
+- Someone periodically checks how AI assistants describe the product, and whether what they say is true.
+
+**Fair play:** keyword stuffing, hidden text, showing crawlers different content, fake reviews, mass low-value pages, and text meant to manipulate AI tools are findings, even when they might work for a while.
+
+**How to check:** fetch the raw HTML with JavaScript off and read what's really there. Use the SEO score from Lighthouse, and a rich results test for structured data. Rankings and AI citations can't be proven from code, so mark them Not verified.
+
+**Severity:** High when a mistake hides the whole site or a key section. Medium for an important page that can't be read or is missing its basics. Low or an Idea for content improvements.
+
+**Don't flag:** logged-in pages, or `llms.txt`, which is optional at most unless the project chooses to use it. Confirm current guidance before calling any AI optimization technique necessary, because this area changes quickly.
