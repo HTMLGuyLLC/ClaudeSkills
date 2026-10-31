@@ -81,7 +81,8 @@ make run:dev
 
 Or, where a build step matters: `make setup`, `make build`, `make run`.
 
-- **Setup does the work:** it installs dependencies, creates local config from the example, starts what the app needs, such as Docker images, then runs migrations and seeds. It's safe to run twice. `migrations` checks those steps in depth.
+- **Setup does the work:** it installs dependencies, creates local config from the example, starts what the app needs, such as Docker images, then runs migrations and seeds. `migrations` checks those steps in depth.
+- **Setup is idempotent in most cases:** running it again skips or safely repeats finished work, with no errors, duplicates, or lost local data. That also makes it the easy way to catch up after pulling new changes. Anything destructive, like wiping a database, belongs in a separate reset command.
 - **Usable right away:** seed data includes test accounts and realistic content, and any manual step, such as adding an API key, is clearly explained.
 - **Same commands across stacks:** a task runner keeps the names the same, instead of `npm run dev` here and `symfony serve` there. `make` works well for this, but it isn't required. One clear, documented command per job is what counts.
 - **Prerequisites are clear:** required tools and versions are listed and checked, ideally by setup itself.

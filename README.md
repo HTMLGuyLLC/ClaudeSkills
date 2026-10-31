@@ -345,7 +345,7 @@ Proving it works needs a run on your oldest targets, and anything that wasn't ru
 - **Labels:** they say what things do, and empty states and errors point to the next step.
 - **Setup:** good defaults, with steps to first value counted and trimmed.
 - **Options:** advanced settings stay out of the way, and ones that don't earn their place are removed.
-- **Local setup:** a new developer or AI agent gets from a fresh clone to a running app in as few commands as possible. Ideally that's `make setup` then `make run:dev`, or `make setup`, `make build`, and `make run`. A task runner like `make` keeps commands the same across stacks, but it isn't required.
+- **Local setup:** a new developer or AI agent gets from a fresh clone to a running app in as few commands as possible. Ideally that's `make setup` then `make run:dev`, or `make setup`, `make build`, and `make run`. A task runner like `make` keeps commands the same across stacks, but it isn't required. In most cases setup should be idempotent, so it can be rerun without errors, duplicates, or lost local data.
 
 </details>
 
