@@ -32,7 +32,7 @@ Read `${CLAUDE_SKILL_DIR}/../audit/SKILL.md` first. If it's missing, stop and te
 4. If the code isn't the user's, such as someone else's PR, confirm before running its lint, tests, or binaries each round.
 5. Create the ledger at `.claude/audits/loop-YYYY-MM-DD-<label>.md`, and add `.claude/audits/` to the git exclude as the audit skill describes. Do this while the user is present, because `.claude/` and `.git/` are protected paths that may prompt for approval. If they prompt, tell the user that an unattended run needs them approved for this session.
 6. Record a restore point with `git stash create`. This changes nothing and prints a commit hash for tracked changes; if it prints nothing, use the hash from `git rev-parse HEAD`. That doesn't cover untracked files, so copy any in the scope to `.claude/audits/loop-YYYY-MM-DD-<label>-restore/`, keeping their paths.
-7. State the worst-case cost before Round 1: agents per round from the audit skill's sizing table, times max rounds, times about 120k tokens. At full size that's about 3.6M tokens, plus any verifier and fix agents.
+7. State the worst-case cost before Round 1: agents per round from the audit skill's sizing table, times max rounds, times about 120k tokens. At full size that's about 4.2M tokens, plus any verifier and fix agents.
 8. If the `personas` lens applies, settle the personas now, as audit Step 4 describes, while the user is present. If the list isn't saved, copy it to the ledger's `Personas` section. Every round uses that same list, and rounds never stop to ask about personas.
 
 ## The ledger
@@ -92,7 +92,7 @@ Keep using the ledger's `Audit dir`, and redo audit Step 2 only if a fix changed
 Put every finding in one bucket:
 
 - **Fix:** every Critical, High, and Medium, unless it belongs in Needs you. Also any Low that's cheap to fix (effort S) and isn't a rare edge case.
-- **Needs you:** a person has to act or decide. This covers rotating leaked secrets or anything outside the repo, including admin panel updates in another project, wording of legal text, pricing or plan changes, setting or changing the compatibility target, product or design choices with no clear answer, major dependency upgrades with breaking changes, migrations that destroy or rewrite data, and new designs for auth, sessions, payments, or schema when the repo has no pattern to follow. Don't invent a security design to clear a finding.
+- **Needs you:** a person has to act or decide. This covers rotating leaked secrets or anything outside the repo, including updates in another project, wording of legal text, pricing or plan changes, setting or changing the compatibility target, product or design choices with no clear answer, major dependency upgrades with breaking changes, migrations that destroy or rewrite data, and new designs for auth, sessions, payments, or schema when the repo has no pattern to follow. Don't invent a security design to clear a finding.
 - **Rare edge case:** Low severity, and it needs unusual conditions or barely matters when it happens. Write down the condition. If you can't name one, it isn't rare.
 - **Left open:** a Low that isn't rare and isn't cheap to fix. Keep it in Open, and list it in the final report.
 - **Dismissed:** verification showed it's wrong or already handled.

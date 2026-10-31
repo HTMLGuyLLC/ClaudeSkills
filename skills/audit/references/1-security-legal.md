@@ -1,4 +1,4 @@
-# Group 1: Security and legal
+# Group 1: Security, privacy, and legal
 
 ## security
 
@@ -42,6 +42,7 @@ Mistakes here tend to expose every account at once, so any change touching this 
 - Cryptography: current algorithms, no home-grown crypto, encryption in transit and at rest, safe randomness for tokens.
 - Misconfiguration: CORS, CSRF, security headers and CSP, debug modes, verbose errors, default credentials, public buckets.
 - SSRF, unsafe deserialization, open redirects, unsafe file uploads, webhook signature checks.
+- Formula injection in CSV and spreadsheet exports.
 - Row-level security: on Supabase or similar, every table has correct policies and explicit grants, and privileged keys never reach the client.
 
 **PCI**
@@ -59,9 +60,43 @@ Mistakes here tend to expose every account at once, so any change touching this 
 **Abuse**
 - Rate limits on AI calls, email or SMS sending, and expensive endpoints.
 - Abuse of free tiers, bulk signups, unbounded uploads, and spam through user content.
+- Products with user content: moderation, ways to report and block people, and a process for illegal content.
 - AI features: prompt injection from user or fetched content, output used without validation, tools given too much access, one customer's data reaching another through context.
 
 **Don't flag:** theoretical attacks with no path from an attacker to the code, or hardening that's irrelevant to the threat (CSRF on a stateless token API, for example).
+
+## privacy
+
+`legal` checks that your policies match the product. `security` keeps attackers out. This lens asks whether the product should handle personal data this way at all, even with no attacker involved.
+
+**Collect less**
+- Each field, event, and log has a real use. Nothing is collected just in case.
+- Optional details are really optional.
+- Sensitive data, such as health, financial, location, or children's data, has a stronger reason behind it.
+- A summary or derived value replaces the raw data where that works.
+
+**Keep it contained**
+- Personal data stays out of logs, analytics, URLs, error reports, and AI prompts unless it's truly needed.
+- Vendors get the minimum they need.
+- Real customer data doesn't reach development, staging, test fixtures, or seed files.
+- Especially sensitive fields get field-level encryption where a database leak would be serious.
+
+**Limit who can see it**
+- Staff access is limited by role and logged, and sensitive details stay hidden by default.
+- Internal tools and exports follow the same rules as the product.
+
+**Keep it only as long as needed**
+- Retention is enforced by real scheduled deletion, including for closed accounts and old logs.
+- Caches, search indexes, and backups don't hold deleted data longer than promised.
+
+**Give people control**
+- Export, correction, and deletion work end to end, including at vendors.
+- Consent is recorded with what was agreed to, and withdrawing it takes effect.
+- Tracking doesn't start before consent where consent is required.
+
+**Severity:** High when personal data reaches somewhere it shouldn't, or deletion doesn't really delete. Medium when more is collected or kept than needed.
+
+**Don't flag:** data the product needs to work, or analytics with no personal data in it.
 
 ## legal
 

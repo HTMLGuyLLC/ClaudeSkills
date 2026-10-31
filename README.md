@@ -29,7 +29,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | `/audit src/checkout` | One folder |
 | `/audit all` | The whole repo |
 
-**Choose which topics to check.** It runs all 26 unless you pick some. The list below shows what each one covers.
+**Choose which topics to check.** It runs all 33 unless you pick some. The list below shows what each one covers.
 
 | Command | What it runs |
 |---|---|
@@ -51,7 +51,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 
 - Its scanners, your lint, and your tests all run at the same time.
 - For anything over 3 files, several reviewers work side by side and share one set of project notes, so they don't repeat the same research.
-- Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 6. More reviewers means more tokens, and it tells you the estimate before it starts.
+- Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 7. More reviewers means more tokens, and it tells you the estimate before it starts.
 - Separate agents double-check a long list of serious findings.
 - `--fix` makes unrelated fixes side by side.
 
@@ -69,9 +69,20 @@ Every topic gets a result, so nothing is skipped silently. Click one to see what
 - **Permissions:** every request checks on the server who you are and what you own, and new routes start closed.
 - **Login and sessions:** rate limits, safe password resets, MFA, OAuth checks, secure cookies, and a logout that really ends the session. Any change here gets a line-by-line read of the whole flow.
 - **Credentials:** strong password hashing, secrets kept out of code and logs, and keys with narrow access that can be rotated.
-- **Common attacks:** the OWASP Top 10 lists for web, API, and AI apps, such as injection, XSS, and SSRF, plus database access rules.
+- **Common attacks:** the OWASP Top 10 lists for web, API, and AI apps, such as injection, XSS, SSRF, and formulas hidden in CSV exports, plus database access rules.
 - **Card data:** PCI rules, and whether card numbers can reach your logs, database, or analytics.
-- **Dependencies and abuse:** known vulnerabilities, outdated or fake packages, spam, free plan abuse, and prompt injection.
+- **Dependencies and abuse:** known vulnerabilities, outdated or fake packages, spam, free plan abuse, prompt injection, and moderation for products with user content.
+
+</details>
+
+<details>
+<summary><code>privacy</code>: Should you be handling this personal data at all?</summary>
+
+- **Collect less:** each field and event has a real use, and optional details are really optional.
+- **Keep it contained:** personal data stays out of logs, analytics, URLs, and AI prompts, and real customer data stays out of staging and seed files.
+- **Limit who sees it:** staff access is limited by role and logged.
+- **Keep it only as long as needed:** retention is enforced by real scheduled deletion.
+- **Give people control:** export, correction, deletion, and withdrawing consent all really work, including at your vendors.
 
 </details>
 
@@ -88,6 +99,18 @@ Every topic gets a result, so nothing is skipped silently. Click one to see what
 </details>
 
 **Reliability** (`/audit reliability`)
+
+<details>
+<summary><code>correctness</code>: Does it do what was asked, and get the right answer?</summary>
+
+- **The goal:** it finds what was asked from your request, the PR, linked issues, and commits, then checks every part was done.
+- **Connected end to end:** the button calls the route, the route saves the field, and the value is still there after a reload.
+- **Nothing half-built:** no stubs, placeholder values, or hardcoded test data.
+- **Math and rules:** business rules, rounding, money, tax, and totals that match on every screen, email, and export.
+- **Edge cases:** empty lists, limits, time zones, month ends, and inverted conditions.
+- **How it checks:** it works out the right answer for a realistic example, then follows that example through the code.
+
+</details>
 
 <details>
 <summary><code>performance</code>: Is it fast, and does it feel fast when it can't be?</summary>
@@ -129,12 +152,38 @@ Timing can only be judged in a running app.
 <details>
 <summary><code>data</code>: Can your data get lost, duplicated, or overwritten?</summary>
 
-- **Migrations:** safe on live traffic, and either reversible or safely forward-only.
 - **Rules:** constraints and uniqueness are enforced by the database, not only in code.
 - **Failures leave nothing half done:** if a step fails partway, everything rolls back. Charges or emails a database can't undo run after the save, or have their own way to be reversed.
 - **Repeats do no harm:** a double click, a retry, or a resent webhook can't charge someone twice or add a duplicate row.
 - **Edits don't overwrite each other:** the newer change isn't silently lost. Changes that don't overlap are merged, and real conflicts keep both versions.
 - **Lifecycle:** deleting really deletes, and dates, money, and precision are stored correctly.
+
+</details>
+
+<details>
+<summary><code>migrations</code>: Can your database be rebuilt from your migrations and seeds?</summary>
+
+- **Framework conventions:** every schema change is a migration, using your framework's own tool, naming, and order.
+- **Nothing run by hand:** it looks for changes that were made directly to a database and should be in a migration, like an index, grant, or access policy.
+- **Safe on live traffic:** no long locks, backfills run in batches, and risky changes roll out in stages.
+- **Seeds kept in step:** every schema change updates seeds and test data, and new features get realistic seed data.
+- **Safe seeds:** they can run twice, can't run against production, and hold no real customer data.
+- **Setup runs it all:** `make setup` or similar starts things like Docker images, waits for them, then runs migrations and seeds.
+
+If it can, it tests this on a throwaway database. It never runs anything against a shared or production database.
+
+</details>
+
+<details>
+<summary><code>operations</code>: Is what runs your code safe, and could you recover?</summary>
+
+- **Build pipeline:** CI steps and images are pinned, tokens have narrow access, and CI builds your releases.
+- **Hosting and access:** infrastructure can be rebuilt, accounts use narrow access and MFA, and databases aren't open to the internet.
+- **Domains and certificates:** they renew automatically, and someone owns them.
+- **Recovery:** backups are automatic and a restore has been tested, and you know how much data and downtime you could lose.
+- **Incidents:** there's a clear owner, runbooks, a fast way to roll back or turn something off, and a way to tell customers.
+
+Much of this lives outside the repo, so it lists what you need to confirm. Small projects aren't held to enterprise process.
 
 </details>
 
@@ -157,7 +206,7 @@ Timing can only be judged in a running app.
 - **Errors:** they reach a tracker or pager, not just a log file.
 - **What hurts:** alerts for downtime, failed payments, failed jobs, error spikes, slow responses, quotas, and expiring keys.
 - **Silent failures:** a job that stops running sends no errors, so it needs a heartbeat.
-- **Noise:** each alert is worth acting on, and goes to someone who would act.
+- **Noise:** each alert is worth acting on, goes to someone who would act, and links to what to do.
 - **Uptime:** production services have health checks and monitoring.
 
 </details>
@@ -252,6 +301,7 @@ Local or low-stakes tools don't need all of this. Whether data really arrives ne
 
 - **Rollout:** risky changes sit behind a flag, and can be rolled back along with their data.
 - **Backward compatibility:** APIs, webhooks, and saved data keep working, including during a deploy.
+- **Deprecation:** removing something customers rely on comes with notice, a date, and a way forward.
 - **Config:** new settings are documented, checked at startup, and set everywhere.
 - **Environments:** the build passes, deploy order is safe, and staging matches production where it counts.
 - **Versioning:** versions and the changelog follow your release process.
@@ -295,6 +345,7 @@ Proving it works needs a run on your oldest targets, and anything that wasn't ru
 - **Labels:** they say what things do, and empty states and errors point to the next step.
 - **Setup:** good defaults, with steps to first value counted and trimmed.
 - **Options:** advanced settings stay out of the way, and ones that don't earn their place are removed.
+- **Local setup:** a new developer or AI agent gets from a fresh clone to a running app in as few commands as possible. Ideally that's `make setup` then `make run:dev`, or `make setup`, `make build`, and `make run`. A task runner like `make` keeps commands the same across stacks, but it isn't required.
 
 </details>
 
@@ -327,10 +378,10 @@ Proving it works needs a run on your oldest targets, and anything that wasn't ru
 
 - **Attention:** what the eye lands on first, second, and third, and whether a new visitor gets the point within 5 seconds.
 - **Main buttons:** one clear primary action per page, with labels that say what happens next and no dark patterns.
-- **Layout:** clear hierarchy, few choices at once, and people always know where they are.
+- **Layout and states:** clear hierarchy, few choices at once, people always know where they are, and loading, empty, error, and offline states plus first-time use are all designed.
 - **Light and dark mode:** both are designed, including logos, charts, and emails, with no flash of the wrong theme.
 - **Mobile:** every width from 320 up, thumb reach, no hover-only features, and forms that work with the on-screen keyboard.
-- **States and reach:** loading, empty, error, and offline states, first-time use, translation, and SEO.
+- **Translation and SEO:** text, dates, and layouts work in each language you support, and public pages are readable by search engines and share well.
 
 Judging how things look needs a running app or screenshots.
 
@@ -371,6 +422,44 @@ These are informed walkthroughs, not real user research.
 - **Billing paths:** upgrade, downgrade, cancel, expired trial, failed payment, and refund all work and keep data intact.
 - **Accuracy:** pricing and feature lists match what each plan really gets.
 - **Placement:** new features go in a plan on purpose, and the free plan stays affordable.
+
+</details>
+
+<details>
+<summary><code>ai</code>: Can people trust your AI features?</summary>
+
+- **Accurate:** evals on realistic examples run again when a prompt or model changes, and the feature can say it doesn't know.
+- **Safe:** risky output gets a human review, and AI actions are limited and can be undone.
+- **Fails well:** outages, refusals, and malformed answers are handled, and users keep their work.
+- **Keeps working:** model retirement dates are known, and prompts are versioned with the code.
+- **Honest with users:** AI output is labeled where needed, and users can correct or report a bad result.
+
+This is skipped if your product doesn't use AI.
+
+</details>
+
+<details>
+<summary><code>notifications</code>: Do your messages arrive, and do people want them?</summary>
+
+- **They arrive:** email domain setup like SPF, DKIM, and DMARC, handled bounces, and visible failed sends.
+- **Right message, right time:** no duplicates or late warnings, with digests for bursts and respect for quiet hours.
+- **People stay in control:** preferences by type and channel, and one-click unsubscribe.
+- **They read well:** templates work on phones and in dark mode, and a missing value never shows `Hi {{name}}`.
+- **Safe test sends:** development and staging can't message real customers.
+
+This covers email, SMS, push, and in-app messages.
+
+</details>
+
+<details>
+<summary><code>api</code>: Are your API, MCP server, CLI, and SDKs good to build on?</summary>
+
+- **Kept in step:** a new feature reaches each surface it belongs on, using shared logic and the same names. If a surface lives in another project, you get a reminder, just like `admin`.
+- **API:** consistent patterns and errors, pagination, rate limit headers, safe retries, a spec that matches reality, and signed webhooks.
+- **MCP server:** tools match real jobs, with clear descriptions, strict inputs, short results, helpful errors, and the signed-in user's permissions.
+- **CLI:** `--help` everywhere, `--json` output, exit codes that mean something, no prompts in scripts, and `--dry-run` on risky commands.
+- **SDKs:** feel natural in each language, handle retries and pagination, and are generated or tested so they can't drift.
+- **Easy to start:** a quick start and examples that run as written.
 
 </details>
 

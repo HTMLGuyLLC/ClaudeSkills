@@ -1,4 +1,29 @@
-# Group 2: Performance, resilience, errors, data
+# Group 2: Correctness, performance, resilience, errors, data, migrations, operations
+
+## correctness
+
+Well-built code can still do the wrong thing. This lens asks whether the change does what it was meant to, and gets the right answer. Every other lens assumes this part works.
+
+**Work out what was asked.** Use the user's request, the PR description, linked issues, commit messages, plans, and existing docs or tests. If the goal can't be found, review the logic anyway and mark the requirement checks Not verified.
+
+**Does what was asked**
+- Every part of the request is done. No stubs, placeholder values, hardcoded test data, or half-built paths are left.
+- Each path connects end to end: the button calls the route, the route saves the field, and the value comes back after a reload.
+- Behavior that should stay the same still does, including for existing data.
+
+**Gets the right answer**
+- **Business rules:** the logic matches the product's docs, pricing, and policies.
+- **Math:** rounding, money stored in the smallest unit, percentages, tax, proration, and division by zero.
+- **Boundaries:** empty, one, the limit, one past the limit, and the first and last items.
+- **Dates and times:** time zones, daylight saving, month ends, and leap years.
+- **Logic:** inverted conditions, wrong operators, mixed-up IDs or units, wrong defaults, and states that can be skipped or reached by mistake.
+- **Same number everywhere:** a total on screen matches the email, invoice, report, and export.
+
+**How to check:** take a realistic example and work out the right answer yourself, without using the code. Then follow the example through the code, or run it if you can, and compare.
+
+**Severity:** Critical or High when it gets money, access, or customer data wrong. Medium for a missing part of the request, or a wrong result with limited reach.
+
+**Don't flag:** a different approach you'd have chosen when this one works. How the code is written is covered by `quality`.
 
 ## performance
 
@@ -65,7 +90,6 @@ Proactive error handling means anticipating failure before a user reports it.
 
 ## data
 
-- **Migrations:** reversible or safely forward-only, safe on live traffic (no long locks), backfills handled, deployable before the code that needs them.
 - **Integrity:** constraints, foreign keys, and uniqueness in the database rather than only in app code.
 - **Transactions and rollback:** a multi-step write either fully happens or leaves no trace. Ask what state is left if any step fails partway.
   - Related writes share one transaction, and every error path rolls it back, including errors caught and handled in app code.
@@ -83,3 +107,79 @@ Proactive error handling means anticipating failure before a user reports it.
 - **Lifecycle:** deletion really deletes (or is deliberately soft), retention rules, and timezones, money, and precision stored correctly.
 
 **Don't flag:** idempotency on reads or on writes that are already safe to repeat, or versioning on data that only one writer can ever touch.
+
+## migrations
+
+Mark this N/A if the project has no database. The database's structure should be fully rebuilt from the project's migrations, and its seed data should always match that structure.
+
+**Used the way the framework intends**
+- Every schema change, and any data change existing environments need, is in a migration. It uses the framework's own tool, naming, folder, and ordering.
+- Production doesn't rely on automatic schema sync, such as `prisma db push`, `synchronize: true`, or `ddl-auto: update`.
+- Generated migrations are reviewed, not trusted blindly, and migrations that already ran anywhere shared are never edited. A new one corrects them.
+- Each migration has one purpose. Migrations from parallel branches can't collide or run in the wrong order.
+- Migrations run in one defined deploy step, exactly once.
+
+**Nothing was done by hand**
+
+A change made directly to a database works until the next fresh environment fails. Look for:
+- Models or code that expect something no migration creates.
+- SQL or commands in PR notes, docs, chats, or one-off scripts that say to run them on a server.
+- Items that are easy to change in a dashboard: indexes, functions, triggers, extensions, enums, grants, and access policies.
+
+If it looks like something was run by hand, the finding names what should be in a migration, and asks a person to confirm what production really has.
+
+**Safe on live traffic**
+- No long locks. Large tables use the database's safe options, and backfills run in batches.
+- Migrations are reversible or safely forward-only, and they can be deployed before the code that needs them. Risky changes roll out in stages: add the new, move over, then remove the old.
+- New tables include their grants and access policies.
+
+**Seeds stay in step**
+- Every schema change updates the seeds: new required fields, renames, removals, new tables, relationships, and new enum values. Test factories and fixtures are updated too.
+- New features get seed data, so a developer can see them working, across the plans, roles, and states that matter.
+- Seeds can run twice safely, and can't run against production.
+- Seeds use made-up data, with no real customer data or real secrets.
+- Data production needs, such as roles or plans, lives in a migration or a separate production-safe seed, not in development seeds.
+
+**Setup runs it all**
+
+`make setup` or its equivalent starts what the app needs, such as Docker images, waits until those services are ready, then runs migrations and seeds. A single reset command rebuilds the local database from scratch.
+
+**How to check:** if the project can run safely, use a throwaway database. Migrate from empty, seed, seed again, and run the framework's drift check, such as `prisma migrate diff`, `makemigrations --check`, or `doctrine:migrations:diff`. Never run this against a shared or production database. Whatever wasn't run is Not verified.
+
+**Severity:** Critical or High for a migration that can lose data or lock production, and High for a change production has but migrations don't. Medium for seeds that fail or have fallen behind.
+
+**When fixing:** write the migration or seed change, and test it only on a local throwaway database. A person decides when it runs anywhere shared.
+
+**Don't flag:** old migrations that already ran, even if they'd be written differently today.
+
+## operations
+
+`resilience` judges how the code copes with failure. This lens judges what the code runs on, and how you'd recover when something serious happens.
+
+**Build pipeline**
+- CI actions and base images are pinned to a version or hash, and third-party steps get the least trust.
+- CI tokens have the narrowest access that works, and secrets can't reach forks or logs.
+- Releases are built by CI from a lockfile, not on someone's laptop.
+- Containers use small maintained images, don't run as root, and keep secrets out of their layers.
+
+**Hosting and access**
+- Infrastructure is defined in code or written down, so it could be rebuilt.
+- Cloud and vendor accounts use narrow access and MFA, with no shared logins, and people who leave lose access.
+- Databases and internal services aren't open to the internet, and traffic uses TLS.
+- Domains and certificates renew automatically, and someone owns them.
+
+**Recovery**
+- Backups are automatic and kept separately, and a restore has actually been tested.
+- The project knows how much data it could lose and how long it could be down, and its setup can meet that.
+- Single points of failure are known, including a vendor, a region, or the one person who knows how something works.
+
+**Incidents**
+- It's clear who owns production and how to reach them.
+- Likely failures have runbooks.
+- Someone can quickly roll back, turn off a feature, or block abuse.
+- There's a way to tell customers during an outage.
+- Serious incidents lead to a review and real fixes.
+
+**How to check:** review what's in the repo, such as workflows, Dockerfiles, infrastructure code, and deploy config. Much of the rest lives outside it, so list what a person should confirm and mark it Not verified.
+
+**Don't flag:** enterprise process for a small project. A solo product doesn't need an on-call rota, but it does need tested backups if it holds data someone would miss.

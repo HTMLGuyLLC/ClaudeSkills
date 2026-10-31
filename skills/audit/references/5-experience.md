@@ -69,6 +69,24 @@ Check each feature against the target using current data from MDN, Can I Use, or
 - Count the steps to first value and flag any that could go.
 - Remove choices and settings that don't earn their place. Every option is a cost to the user.
 
+**Local setup is clone and run**
+
+A new developer or AI agent should get from a fresh clone to a running app with as few commands as possible. This is the target:
+
+```bash
+git clone <repo>
+make setup
+make run:dev
+```
+
+Or, where a build step matters: `make setup`, `make build`, `make run`.
+
+- **Setup does the work:** it installs dependencies, creates local config from the example, starts what the app needs, such as Docker images, then runs migrations and seeds. It's safe to run twice. `migrations` checks those steps in depth.
+- **Usable right away:** seed data includes test accounts and realistic content, and any manual step, such as adding an API key, is clearly explained.
+- **Same commands across stacks:** a task runner keeps the names the same, instead of `npm run dev` here and `symfony serve` there. `make` works well for this, but it isn't required. One clear, documented command per job is what counts.
+- **Prerequisites are clear:** required tools and versions are listed and checked, ideally by setup itself.
+- **The docs are true:** the README's first steps match what really works, and CI uses the same commands so they stay working.
+
 ## consistency
 
 This lens has to search the whole repo, because inconsistency lives outside the diff.
@@ -171,7 +189,19 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 **Reach**
 - **First run:** a new user reaches first value quickly, with guidance that doesn't block them.
 - **Cross-browser:** covered by `compatibility`.
-- **i18n:** strings not hardcoded if the product is translated, long-text and right-to-left layouts, and locale formats.
-- **SEO and sharing (public pages):** titles, descriptions, canonical URLs, sitemaps, structured data, and Open Graph images.
+
+**Translation and locale** (if the product is translated, or has users in other countries)
+- Text isn't hardcoded, and plurals and variables go through the translation library rather than joined strings.
+- Dates, times, numbers, and currencies follow the user's locale, and time zones are clear.
+- Layouts survive longer text and right-to-left languages.
+- Emails, errors, PDFs, and legal pages are covered too, with a sensible fallback language.
+- The language can be chosen and is remembered, rather than being guessed from location alone.
+
+**SEO and sharing** (public pages)
+- Each page has its own title, description, and one main heading.
+- Search engines can read it: real content without waiting on JavaScript, a correct `robots.txt` and sitemap, canonical URLs, and no accidental `noindex`. Staging stays out of search.
+- Structured data matches what's on the page, and shared links show a good preview with an Open Graph image.
+- URLs are readable, moved pages redirect, and missing pages return a real 404.
+- Internal links reach every important page, and translated pages use `hreflang`.
 
 **How to check:** run the app and take screenshots of each key page at the widths above, in both themes, then judge what you see. Look at the page before reading its code, so the code doesn't tell you what you're supposed to see. Attention, hierarchy, theme, and layout can't be proven from code, so mark them Not verified without a running app or screenshots. Give each finding the page, width, and theme where it shows up.

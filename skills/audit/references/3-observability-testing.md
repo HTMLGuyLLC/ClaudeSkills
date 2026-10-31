@@ -16,7 +16,7 @@ Logging only helps if someone finds out. For each new failure mode, ask: how wou
 - Errors reach a tracker or pager (Sentry or similar), not just a log file.
 - Alerts exist for what hurts: downtime, failed payments, failed background jobs, webhook failures, error-rate spikes, slow responses, quota or budget limits, and expiring certificates or keys.
 - Silent failures are covered: a job that stops running produces no errors, so it needs a heartbeat or dead-man's switch.
-- Alerts are actionable and go to someone who'd act. A noisy alert is a finding too.
+- Alerts are actionable, go to someone who'd act, and link to what to do. A noisy alert is a finding too.
 - Health checks and uptime monitoring exist for production services.
 
 ## tracing
