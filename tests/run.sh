@@ -207,6 +207,14 @@ out=$(cd "$s" && touch requirements.txt composer.lock &&
 expect "pip-audit skipped" "skipped  pip-audit (--no-project-code" "$out"
 expect "composer audit skipped" "skipped  composer-audit (--no-project-code" "$out"
 rm -f "$s/requirements.txt" "$s/composer.lock"
+vulture_bin="$work/vulture-bin"
+mkdir -p "$vulture_bin"
+printf '#!/bin/sh\nexit 0\n' > "$vulture_bin/vulture"
+chmod +x "$vulture_bin/vulture"
+out=$(cd "$s" && touch pyproject.toml && PATH="$vulture_bin:$PATH" SCANNER_TIMEOUT=5 \
+  bash "$scanners" "$work/scan-python" --no-project-code 2>&1)
+expect "dead code scan runs on Python projects" "ran      vulture" "$out"
+rm -f "$s/pyproject.toml"
 
 # --- personas: find what a project already says
 p=$(new_repo)

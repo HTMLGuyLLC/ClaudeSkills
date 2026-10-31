@@ -40,7 +40,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 3 | `analytics` | Product events and funnels | same |
 | 3 | `tests` | Unit, integration, performance tests | same |
 | 4 | `practices` | Framework-recommended approach, build vs. buy | `references/4-engineering.md` |
-| 4 | `quality` | Concise, not duplicated, current conventions, file structure and size | same |
+| 4 | `quality` | Concise, not duplicated, dead and orphaned code, current conventions, file structure and size | same |
 | 4 | `leftovers` | Remains of earlier attempts, references to what never shipped, repetitive or unnecessary code and UI | same |
 | 4 | `cost` | Deterministic first, AI as fallback, spend limits | same |
 | 4 | `delivery` | Rollout, rollback, compatibility, config, CI | same |

@@ -136,6 +136,10 @@ if [ -f package.json ]; then
   local_bin knip "npm i -D knip" knip --no-exit-code
   local_bin jscpd "npm i -D jscpd" jscpd . --silent --ignore "**/node_modules/**,**/dist/**,**/build/**,**/.next/**"
 fi
+if [ -f requirements.txt ] || [ -f pyproject.toml ]; then
+  # Only parses the code, so it's safe with --no-project-code.
+  tool vulture "pipx install vulture" vulture . --min-confidence 80 --exclude ".venv,venv,node_modules,dist,build"
+fi
 
 wait
 note "== Done. Full output is in $out =="

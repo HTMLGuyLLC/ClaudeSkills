@@ -13,11 +13,27 @@
 
 ## quality
 
-- **Not overly verbose:** say it in fewer lines when that's equally clear. Remove dead code, needless wrappers, and comments that repeat the code.
+- **Not overly verbose:** say it in fewer lines when that's equally clear. Remove needless wrappers and comments that repeat the code.
 - **Not duplicative:** no large repeated chunks. Small repetition is fine; three real uses justify a shared helper. Use scanner output when available.
 - **Current:** latest stable language features, APIs, and conventions. Flag deprecated functions and patterns the ecosystem has moved past.
 - **Readable:** clear names, small focused functions, matches surrounding style, and no leftover debug code or stale TODOs.
 - **Lint and types:** clean for the code in scope.
+
+**Dead and orphaned code**
+
+Start with scanner results when they exist, then confirm each item by searching. Tools miss dynamic uses and report false positives, and they rarely see orphaned product surfaces at all. On a diff, check what the change stopped using, since removing a caller can orphan what it called. On `all`, check the whole repo.
+
+- **Dead code:** unreachable branches, code after a return, conditions that are always true or false, commented-out blocks, and unused functions, classes, exports, variables, parameters, and imports.
+- **Orphaned code:** code that still builds but nothing in the product reaches. That means files nothing imports, pages and components no link or menu leads to, endpoints no client calls, jobs nothing schedules, events nothing fires, styles nothing uses, and tables or columns nothing reads.
+- **Kept alive only by tests:** code used only by its own tests is orphaned, and so are the tests.
+- **Stuck flags:** a feature flag that's permanently on or off leaves one side dead.
+- **Chains:** removing one item often orphans what it called, so follow the chain and report it as one finding.
+
+**Severity:** usually Low. Use Medium if it could mislead someone. Use at least Medium for an orphaned endpoint, page, or job that can still be reached, because it's untested and unwatched attack surface. Rate it under `security` too if it exposes data or skips a permission check.
+
+**When fixing:** search strings, config, reflection, and dynamic imports before deleting, and leave anything you can't prove is unused as a finding. Dropping a table or column is a migration, so a person decides.
+
+**Don't flag:** a library's public API, entry points the framework finds by convention, parameters a required signature forces, or generated code.
 
 **File structure and size**
 

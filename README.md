@@ -214,12 +214,12 @@ Local or low-stakes tools don't need all of this. Whether data really arrives ne
 <details>
 <summary><code>quality</code>: Is the code short, clear, well organized, and current?</summary>
 
-- **Not too long or repeated:** no dead code, needless wrappers, comments that repeat the code, or large copied chunks.
+- **Not too long or repeated:** no needless wrappers, comments that repeat the code, or large copied chunks.
+- **Dead and orphaned code:** unreachable or unused code, plus code that still builds but nothing reaches, like files nothing imports, pages with no link, endpoints no client calls, and jobs nothing schedules.
 - **Short flows:** routes, jobs, and pages read like a short list of steps, with the details in named functions and classes they call.
 - **File structure and size:** classes, large functions, and shared types get their own files, and each file has one job. This loads less into an AI's context, causes fewer merge conflicts, and makes logic easier to scan, reuse, remove, or put behind a feature flag.
 - **Current:** latest stable features, with nothing deprecated.
-- **Readable:** clear names, small functions, and no leftover debug code.
-- **Clean:** lint and type checks pass.
+- **Readable and clean:** clear names, small functions, no leftover debug code, and passing lint and type checks.
 
 </details>
 
