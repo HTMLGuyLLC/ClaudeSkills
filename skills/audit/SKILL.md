@@ -39,7 +39,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 3 | `analytics` | Product events and funnels | same |
 | 3 | `tests` | Unit, integration, performance tests | same |
 | 4 | `practices` | Framework-recommended approach, build vs. buy | `references/4-engineering.md` |
-| 4 | `quality` | Concise, not duplicated, current conventions | same |
+| 4 | `quality` | Concise, not duplicated, current conventions, file structure and size | same |
 | 4 | `cost` | Deterministic first, AI as fallback, spend limits | same |
 | 4 | `delivery` | Rollout, rollback, compatibility, config, CI | same |
 | 5 | `a11y` | WCAG AA minimum, AAA when low-hanging fruit | `references/5-experience.md` |
