@@ -15,6 +15,8 @@ Target WCAG 2.2 AA at minimum. Take AAA when it's low-hanging fruit.
 
 **AAA when cheap:** 7:1 contrast where the palette allows it, 44×44px targets, plain-language copy, no time limits, and no needless animation. Report these as Low or Idea, never as blockers.
 
+Attention span and quick reading are covered by `ux`.
+
 **How to check:** run axe or Lighthouse if the app can run, and use the keyboard yourself. Code review alone can't prove contrast or focus order, so mark those Not verified without a running app.
 
 ## compatibility
@@ -146,6 +148,48 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 - The main message and action are visible without scrolling, and a first-time visitor can say what the page is for within 5 seconds.
 - Anything that moves or pops up has to be worth the interruption.
 
+**Attention span**
+
+Content should be quick to take in, including for people with ADHD and anyone busy or distracted. This helps everyone, and it applies to marketing pages, in-app text, emails, and help content.
+
+- **Skim test:** reading only the headings, bold text, and buttons still gives the main point and the next step.
+- **Key point first:** each page and section leads with what matters most, before any background.
+- **Small pieces:** short paragraphs, one idea per block, lists where they're clearer, and no walls of text.
+- **Short by default:** cut anything that doesn't help. Extra detail sits behind a link or expandable section.
+- **Quick tasks:** long forms and flows are split into small steps, with visible progress and a clear next action.
+- **Few distractions:** no autoplay, rotating carousels, or stacked pop-ups competing with the task. A video has a text summary.
+- **Easy to resume:** after an interruption, people can pick up where they left off without losing their work.
+
+**Emotion and feel**
+
+Name the feeling this product should create, using its brand, `DESIGN.md`, and audience, such as calm and safe for finance or playful for a game. Then judge whether each page creates that feeling. Before reading anything, write down three words for your first impression.
+
+- **Color:** the palette creates the right mood. Blues often feel calm and trustworthy, reds urgent or alarming, greens positive, warm colors energetic, and muted tones quiet. Judge meaning against the audience and culture, because it varies. Too much red can make a calm task feel stressful, and color shouldn't contradict meaning, such as a red button for a positive action.
+- **Layout and space:** generous space tends to feel calm and premium, and dense layouts feel busy or urgent, though experts may want that density. Symmetry feels stable, asymmetry feels energetic, and cramped layouts feel stressful.
+- **Type:** the typefaces, weight, and size suit the mood, such as traditional, modern, or friendly.
+- **Imagery and icons:** real photos, illustrations, and icon style fit the audience, and nothing feels generic or out of place.
+- **Motion:** speed and easing match the mood, from soft and calm to quick and confident.
+- **Words:** tone fits the moment. Errors stay calm and never blame the user, and successes feel earned.
+- **Key moments:** check how people feel at first impression, while waiting, on an error, at payment, on bad news, and when leaving. Payment and privacy moments should reassure, and failed payments or cancellations should support rather than punish.
+- **Trust:** the design looks credible enough for what it asks of people, especially money or personal data.
+
+A finding here names the element, the feeling it creates, the feeling the product wants, and why that matters. Personal taste isn't a finding.
+
+**Usability**
+- **Status:** people can always tell what's happening.
+- **Familiar:** it uses the users' own words, and standard patterns they already know.
+- **Control:** people can cancel, go back, and undo.
+- **Preventing mistakes:** good constraints and defaults stop errors before they happen.
+- **Recognition over memory:** options stay visible, so people don't have to remember them.
+- **Efficiency:** frequent users get shortcuts, and fewer choices lead to quicker decisions.
+- **Help:** it's there at the moment it's needed.
+
+**Navigation and flows**
+- Navigation follows how users think, not how the company or code is organized, and labels are clear.
+- Count the steps for each top task, then remove any that aren't needed. No flow ends in a dead end.
+- Search works and copes with typos, where the product needs it.
+- Forms ask for as little as possible, in a logical order, with autofill, smart defaults, and errors shown as people go.
+
 **Calls to action**
 - Each page or screen has one primary action, and it's obvious which one. Secondary and tertiary actions look clearly quieter.
 - The hierarchy matches the business goal: the most valuable action gets the most weight, and key actions are pushed rather than buried.
@@ -161,6 +205,14 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 - Alignment and spacing follow a consistent rhythm, and line length stays readable.
 - Cognitive load is low: few choices at once, sensible grouping, and detail revealed when it's needed.
 - Users always know where they are, how to get back, and what to do next. Page state survives refresh and deep links.
+
+**Visual craft**
+- **Color:** a small, harmonious palette where each color has a clear role.
+- **Type:** few typefaces, a clear scale, and comfortable line height.
+- **Grouping:** related things sit together and look alike, and white space separates what's different.
+- **Imagery:** images are sharp, on brand, and in one style, and icons come from one set.
+- **Polish:** corners, shadows, borders, and alignment are consistent, and nothing looks like an unstyled default.
+- **Delight:** small touches reward people where they fit, without slowing them down.
 
 **Light and dark mode**
 - Both themes are designed, not inverted. Each has its own hierarchy, and the focal point and CTA stand out equally in both.
@@ -200,7 +252,7 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 
 **SEO and sharing:** covered by `seo`.
 
-**How to check:** run the app and take screenshots of each key page at the widths above, in both themes, then judge what you see. Look at the page before reading its code, so the code doesn't tell you what you're supposed to see. Attention, hierarchy, theme, and layout can't be proven from code, so mark them Not verified without a running app or screenshots. Give each finding the page, width, and theme where it shows up.
+**How to check:** run the app and take screenshots of each key page at the widths above, in both themes, then judge what you see. Look at the page before reading its code, so the code doesn't tell you what you're supposed to see. Attention, emotion, hierarchy, theme, and layout can't be proven from code, so mark them Not verified without a running app or screenshots. Give each finding the page, width, and theme where it shows up.
 
 ## seo
 

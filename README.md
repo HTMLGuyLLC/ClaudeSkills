@@ -374,14 +374,15 @@ Proving it works needs a run on your oldest targets, and anything that wasn't ru
 </details>
 
 <details>
-<summary><code>ux</code>: Does each page guide people to the right action?</summary>
+<summary><code>ux</code>: Is it clear, easy to use, and does it feel right?</summary>
 
 - **Attention:** what the eye lands on first, second, and third, and whether a new visitor gets the point within 5 seconds.
+- **Attention span:** content can be taken in quickly, even with ADHD. Skimming headings and bold text gives the main point, the key point comes first, tasks are split into small steps, and distractions are cut.
+- **Emotion and feel:** whether colors, layout, type, images, motion, and words create the feeling your product wants, including at tense moments like payment and errors. Personal taste doesn't count as a finding.
+- **Usability:** clear status, familiar patterns, undo, mistake prevention, simple navigation, short flows, good forms, and designed loading, empty, and error states.
 - **Main buttons:** one clear primary action per page, with labels that say what happens next and no dark patterns.
-- **Layout and states:** clear hierarchy, few choices at once, people always know where they are, and loading, empty, error, and offline states plus first-time use are all designed.
-- **Light and dark mode:** both are designed, including logos, charts, and emails, with no flash of the wrong theme.
-- **Mobile:** every width from 320 up, thumb reach, no hover-only features, and forms that work with the on-screen keyboard.
-- **Translation:** text, dates, and layouts work in each language you support.
+- **Visual craft:** a clear hierarchy, a harmonious palette, good type and spacing, consistent polish, and light and dark modes that are both designed.
+- **Mobile and translation:** every width from 320 up, thumb reach, no hover-only features, and text and layouts that work in each language you support.
 
 Judging how things look needs a running app or screenshots.
 

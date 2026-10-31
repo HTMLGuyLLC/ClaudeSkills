@@ -53,7 +53,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 5 | `simplicity` | Plain words, fast setup, clone-and-run local setup, progressive depth | same |
 | 5 | `consistency` | Verbiage, design, architecture, ideals | same |
 | 5 | `docs` | README, markdown, help center, blog, changelog, and whether each public changelog fits its audience | same |
-| 5 | `ux` | Attention, CTAs, light and dark mode, mobile, UI states, i18n | same |
+| 5 | `ux` | Attention span, emotion, usability, flows, CTAs, visual craft, light and dark mode, mobile, UI states, i18n | same |
 | 5 | `seo` | Search engines and AI assistants can find, understand, and cite public pages | same |
 | 6 | `personas` | Walkthroughs as each customer type | `references/6-product.md` |
 | 6 | `admin` | Customer changes can be seen and handled from the admin panel, here or in another project | same |
