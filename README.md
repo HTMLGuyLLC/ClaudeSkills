@@ -19,94 +19,23 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 
 **What it does:** Reviews your code like a team of experts, covering security, speed, accessibility, design, legal, and more. It gives you a clear answer: Ship, Ship after fixes, or Don't ship. It doesn't change your code unless you ask.
 
-**How it stays fast:** Its scanners, your lint, and your tests all run at the same time. For anything over 3 files, several reviewers work side by side, and they share one set of project notes so they don't each repeat the same research. Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 6. More reviewers means more tokens, and it tells you the estimate before it starts. Separate agents also double-check a long list of serious findings, and `--fix` makes unrelated fixes side by side.
+**Choose what to check:**
 
-**Check what you're working on now:**
+| Command | What it checks |
+|---|---|
+| `/audit` | What you're working on now |
+| `/audit pr 123` | A pull request |
+| `/audit last 3` | Your last 3 commits |
+| `/audit src/checkout` | One folder |
+| `/audit all` | The whole repo |
 
-```text
-/audit
-```
+**Choose which topics to check.** It runs all 22 unless you pick some. The list below shows what each one covers.
 
-**Check something specific:**
-
-```text
-/audit pr 123
-```
-
-```text
-/audit last 3
-```
-
-```text
-/audit src/checkout
-```
-
-```text
-/audit all
-```
-
-**Check only one topic:**
-
-```text
-/audit security
-```
-
-```text
-/audit personas
-```
-
-**Check how your pages look and work:**
-
-```text
-/audit ux
-```
-
-This checks what catches the eye, whether the main buttons push people toward the key actions, light and dark mode, and mobile at every screen size. It also covers layout, loading and error states, and first-time use. It needs a running app or screenshots to judge how things look.
-
-**Check that your app is fast, and feels fast when it can't be:**
-
-```text
-/audit performance
-```
-
-This measures real speed, like page load and slow queries. It also looks at each wait a user can see and asks what would make it feel shorter. The ideas apply to whatever your product does, and these are only examples:
-
-- **Answer before the work finishes:** a like button responds right away and saves in the background.
-- **Show the shape first:** a feed shows its layout, then the posts.
-- **Show a cheap version first:** a large photo shows a tiny blurred preview.
-- **Shape the wait:** a progress bar starts slow and finishes fast.
-- **Work while the user is busy:** a file uploads while you write the caption, or your first field is parsed while you type the second.
-- **Show the work:** a long search shows what it's doing as it goes.
-
-These ideas must stay honest. A fake count, or a success message for something that failed, is reported as a problem. Timing can only be judged in a running app.
-
-**Check that repeats and simultaneous edits are safe:**
-
-```text
-/audit data
-```
-
-Besides migrations and data rules, this checks three things:
-
-- **Failures leave nothing half done:** if a step fails partway, everything rolls back, and charges or emails that a database can't undo run after the save or have their own way to be reversed.
-- **Repeats do no harm:** a double click, a retry, or a resent webhook can't charge someone twice or add a duplicate row.
-- **Edits don't overwrite each other:** if two people change the same record, the newer change isn't silently lost. Changes that don't overlap are merged, and real conflicts keep both versions so nothing the user typed disappears.
-
-**Check that what you promise is still true:**
-
-```text
-/audit legal
-```
-
-This compares your privacy policy and terms with what the product really does. It also checks every claim on your site and in your app, like "cancel anytime" or "99.9% uptime", and marks each one True, False, Stale, or Unproven. With `--fix`, it corrects anything out of date right away, then lists each old and new wording for you to review afterwards. The one exception is a new promise that would cost you time or money, like a refund or a support commitment. It asks you about those in the chat first.
-
-**Check a group of topics:**
-
-```text
-/audit protect
-```
-
-The groups are `protect`, `reliability`, `observability`, `engineering`, `experience`, and `product`.
+| Command | What it runs |
+|---|---|
+| `/audit security` | One topic |
+| `/audit security,ux` | Several topics |
+| `/audit protect` | One group of topics |
 
 **Options:**
 
@@ -117,7 +46,292 @@ The groups are `protect`, `reliability`, `observability`, `engineering`, `experi
 /audit pr 123 --quick
 ```
 
-The first time the `personas` check runs in a project, it uses `/personas` to work out who your users are. After that it reuses the saved list.
+<details>
+<summary><b>How it stays fast</b></summary>
+
+- Its scanners, your lint, and your tests all run at the same time.
+- For anything over 3 files, several reviewers work side by side and share one set of project notes, so they don't repeat the same research.
+- Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 6. More reviewers means more tokens, and it tells you the estimate before it starts.
+- Separate agents double-check a long list of serious findings.
+- `--fix` makes unrelated fixes side by side.
+
+</details>
+
+#### What it checks
+
+Every topic gets a result, so nothing is skipped silently. Click one to see what it covers.
+
+**Protect** (`/audit protect`)
+
+<details>
+<summary><code>security</code>: Can someone break in, reach other people's data, or abuse the product?</summary>
+
+- **Permissions:** every request checks on the server who you are and what you own, and new routes start closed.
+- **Login and sessions:** rate limits, safe password resets, MFA, OAuth checks, secure cookies, and a logout that really ends the session. Any change here gets a line-by-line read of the whole flow.
+- **Credentials:** strong password hashing, secrets kept out of code and logs, and keys with narrow access that can be rotated.
+- **Common attacks:** the OWASP Top 10 lists for web, API, and AI apps, such as injection, XSS, and SSRF, plus database access rules.
+- **Card data:** PCI rules, and whether card numbers can reach your logs, database, or analytics.
+- **Dependencies and abuse:** known vulnerabilities, outdated or fake packages, spam, free plan abuse, and prompt injection.
+
+</details>
+
+<details>
+<summary><code>legal</code>: Are your policies and public promises still true?</summary>
+
+- **Terms and privacy:** they exist, are linked at signup and payment, and match the data, vendors, cookies, retention, and prices you really have.
+- **Every claim:** each one on your site and in your app, like "cancel anytime" or "99.9% uptime", is marked True, False, Stale, or Unproven.
+- **Disclaimers:** added where the law or a real risk needs one, and removed where one only hurts the product.
+- **Regional rules:** GDPR, US state privacy laws, the EU AI Act, accessibility law, and others that plausibly apply to you.
+- **Licenses:** whether your packages, fonts, images, and data can be used the way you use them.
+- **With `--fix`:** it corrects anything out of date right away, then lists each old and new wording for you to review. A new promise that would cost you time or money, like a refund, is raised in the chat first.
+
+</details>
+
+**Reliability** (`/audit reliability`)
+
+<details>
+<summary><code>performance</code>: Is it fast, and does it feel fast when it can't be?</summary>
+
+- **Page load:** Core Web Vitals, bundle size, images, fonts, and third-party scripts.
+- **Queries:** N+1 queries, missing indexes, and results with no limit.
+- **Parallel work:** calls that could run together, and fan-outs that need a limit.
+- **Caching and background work:** the right cache, and slow work moved off the request.
+- **How waits feel:** a like responds right away, a feed shows its layout first, a photo shows a blurred preview, a progress bar finishes fast, a file uploads while you write the caption, and a long search shows what it's doing.
+- **Honesty:** a fake count, or a success message for something that failed, is reported as a problem.
+
+Timing can only be judged in a running app.
+
+</details>
+
+<details>
+<summary><code>resilience</code>: Does it keep working when something else fails?</summary>
+
+- **Timeouts:** on every network, database, and AI call.
+- **Retries:** limited, spaced out, and only for failures that might pass.
+- **Outages:** what still works when a service you depend on is down.
+- **Scaling:** whether it still works with two servers or 10 times the traffic.
+- **Background jobs:** queues, safe re-runs, and jobs that survive a deploy.
+- **Recovery:** single points of failure, clean shutdowns, backups, and restores.
+
+</details>
+
+<details>
+<summary><code>errors</code>: When something goes wrong, does the user know what to do next?</summary>
+
+- **Likely failures:** empty or oversized input, expired sessions, dropped connections, denied permissions, and double submits.
+- **Validation:** input is checked at every entry point, and fails early with a specific message.
+- **Error messages:** they say what happened and what to do next, keep what the user typed, and offer a retry when it helps.
+- **Crashes:** one failure doesn't blank the page, and 404 and 500 pages are designed.
+- **Nothing dropped:** each error is either handled or reported, with enough detail to debug.
+
+</details>
+
+<details>
+<summary><code>data</code>: Can your data get lost, duplicated, or overwritten?</summary>
+
+- **Migrations:** safe on live traffic, and either reversible or safely forward-only.
+- **Rules:** constraints and uniqueness are enforced by the database, not only in code.
+- **Failures leave nothing half done:** if a step fails partway, everything rolls back. Charges or emails a database can't undo run after the save, or have their own way to be reversed.
+- **Repeats do no harm:** a double click, a retry, or a resent webhook can't charge someone twice or add a duplicate row.
+- **Edits don't overwrite each other:** the newer change isn't silently lost. Changes that don't overlap are merged, and real conflicts keep both versions.
+- **Lifecycle:** deleting really deletes, and dates, money, and precision are stored correctly.
+
+</details>
+
+**Observability** (`/audit observability`)
+
+<details>
+<summary><code>logging</code>: Could you work out what happened from your logs?</summary>
+
+- **Coverage:** logins, payments, permission changes, failed outside calls, job results, and admin actions.
+- **Structure:** each entry has a level, a request ID, and enough detail to debug.
+- **Levels:** errors are worth acting on, and normal traffic isn't logged as an error.
+- **Safety:** no secrets, card data, or needless personal data.
+- **Volume:** your existing logger is used, without noisy logging in hot loops.
+
+</details>
+
+<details>
+<summary><code>alerting</code>: Would you find out before a customer tells you?</summary>
+
+- **Errors:** they reach a tracker or pager, not just a log file.
+- **What hurts:** alerts for downtime, failed payments, failed jobs, error spikes, slow responses, quotas, and expiring keys.
+- **Silent failures:** a job that stops running sends no errors, so it needs a heartbeat.
+- **Noise:** each alert is worth acting on, and goes to someone who would act.
+- **Uptime:** production services have health checks and monitoring.
+
+</details>
+
+<details>
+<summary><code>analytics</code>: Can you tell whether a feature works?</summary>
+
+- **Feature events:** new features show adoption, completion, and drop-off.
+- **Funnels:** signup, activation, upgrade, and churn are measured end to end.
+- **Naming:** events follow your existing names, with no duplicates.
+- **Privacy:** consent is respected, personal data stays out, and vendors match your privacy policy.
+- **Segments:** results can be split by plan and customer type.
+
+</details>
+
+<details>
+<summary><code>tests</code>: Would your tests catch a real bug?</summary>
+
+- **Unit:** new logic, edge cases, and a test for every bug fix.
+- **Integration:** API routes, the database, auth rules, webhooks, and key user flows.
+- **Performance:** load tests on busy paths, and size or speed budgets where they matter.
+- **Quality:** tests check behavior, aren't flaky, and don't mock away what they should prove.
+- **AI features:** evals for output quality, plus provider failures and malformed output.
+- **CI:** tests run before merge, and nothing is skipped without a reason.
+
+</details>
+
+**Engineering** (`/audit engineering`)
+
+<details>
+<summary><code>practices</code>: Is this the right way to build it?</summary>
+
+- **Framework first:** built-in routing, forms, images, and auth instead of custom code, checked against the current docs.
+- **Build or buy:** small helpers are written by hand, and hard things like auth, crypto, dates, and payments use a tested package.
+- **New packages:** health, size, license, and upkeep are weighed.
+- **Structure:** the right level of abstraction, with types used rather than bypassed.
+
+</details>
+
+<details>
+<summary><code>quality</code>: Is the code short, clear, and current?</summary>
+
+- **Not too long:** no dead code, needless wrappers, or comments that repeat the code.
+- **Not repeated:** no large copied chunks.
+- **Current:** latest stable features, with nothing deprecated.
+- **Readable:** clear names, small functions, and no leftover debug code.
+- **Clean:** lint and type checks pass.
+
+</details>
+
+<details>
+<summary><code>cost</code>: Are you paying more than you need to, especially for AI?</summary>
+
+- **AI as a fallback:** whether a rule, lookup, or query could do the job, fully or for the common cases.
+- **Cheap first:** simple checks run first, and AI handles only what's left.
+- **Efficient use:** the cheapest model that works, with caching, batching, and output limits.
+- **Spend limits:** per-user and overall caps, so one user or a loop can't run up the bill.
+- **Plan margins:** usage is measured, and each plan's price covers its AI cost.
+- **Other spend:** costly queries, storage, bandwidth, email, SMS, and idle compute.
+
+</details>
+
+<details>
+<summary><code>delivery</code>: Can this ship safely, and be undone?</summary>
+
+- **Rollout:** risky changes sit behind a flag, and can be rolled back along with their data.
+- **Compatibility:** APIs, webhooks, and saved data keep working, including during a deploy.
+- **Config:** new settings are documented, checked at startup, and set everywhere.
+- **Environments:** the build passes, deploy order is safe, and staging matches production where it counts.
+- **Versioning:** versions and the changelog follow your release process.
+
+</details>
+
+**Experience** (`/audit experience`)
+
+<details>
+<summary><code>a11y</code>: Can everyone use it?</summary>
+
+- **Standard:** WCAG 2.2 AA at minimum, plus AAA where it's cheap.
+- **Keyboard:** everything works without a mouse, with visible focus and no traps.
+- **Screen readers:** real HTML structure, labels, alt text, and announced updates.
+- **Contrast:** checked in both light and dark themes.
+- **Forms:** visible labels, and errors tied to their fields and not shown by color alone.
+- **Size and motion:** large enough targets, text that resizes, and reduced-motion settings respected.
+
+Contrast and focus order need a running app to confirm.
+
+</details>
+
+<details>
+<summary><code>simplicity</code>: Is it easy to understand and quick to set up?</summary>
+
+- **Words:** plain enough for beginners, without talking down to experts.
+- **Labels:** they say what things do, and empty states and errors point to the next step.
+- **Setup:** good defaults, with steps to first value counted and trimmed.
+- **Options:** advanced settings stay out of the way, and ones that don't earn their place are removed.
+
+</details>
+
+<details>
+<summary><code>consistency</code>: Does everything match everywhere?</summary>
+
+- **Wording:** a changed term is updated in code, UI, docs, emails, and marketing, with one name for each idea.
+- **Naming:** variables, files, routes, columns, and events follow the same conventions.
+- **Design:** the same tokens, components, and patterns for the same jobs.
+- **Architecture:** the same job is done the same way across the codebase.
+- **Ideals:** decisions match what the product says it stands for.
+- **Sibling fixes:** a bug fixed in one place is fixed in its copies too.
+
+</details>
+
+<details>
+<summary><code>docs</code>: Did this change make anything out of date?</summary>
+
+- **Repo docs:** the README, setup steps, screenshots, changelog, and other markdown.
+- **Customer help:** the help center, in-app help, tooltips, and onboarding.
+- **Developer docs:** API docs, SDK examples, and settings references.
+- **Marketing:** the blog, feature lists, pricing, and emails.
+- **Outside the repo:** anything it can't reach is listed for you to update.
+
+</details>
+
+<details>
+<summary><code>ux</code>: Does each page guide people to the right action?</summary>
+
+- **Attention:** what the eye lands on first, second, and third, and whether a new visitor gets the point within 5 seconds.
+- **Main buttons:** one clear primary action per page, with labels that say what happens next and no dark patterns.
+- **Layout:** clear hierarchy, few choices at once, and people always know where they are.
+- **Light and dark mode:** both are designed, including logos, charts, and emails, with no flash of the wrong theme.
+- **Mobile:** every width from 320 up, thumb reach, no hover-only features, and forms that work with the on-screen keyboard.
+- **States and reach:** loading, empty, error, and offline states, first-time use, other browsers, translation, and SEO.
+
+Judging how things look needs a running app or screenshots.
+
+</details>
+
+**Product** (`/audit product`)
+
+<details>
+<summary><code>personas</code>: How does this feel to each type of customer?</summary>
+
+- **Walkthroughs:** it goes through the change as each person, with their goals and limits.
+- **Report:** what worked, and where they got stuck, confused, or let down.
+- **Choosing who:** 4 to 8 people for an ordinary change, and everyone who fits for a release or full audit.
+- **First run:** `/personas` works out who your users are, and later audits reuse that list.
+- **Gaps:** it suggests any kind of user the list is missing.
+
+These are informed walkthroughs, not real user research.
+
+</details>
+
+<details>
+<summary><code>plans</code>: Do your plans and billing work the way you say?</summary>
+
+- **Gating:** enforced on the server, not just hidden in the UI.
+- **Limits:** clear before people reach them, and hitting one explains what to do.
+- **Billing paths:** upgrade, downgrade, cancel, expired trial, failed payment, and refund all work and keep data intact.
+- **Accuracy:** pricing and feature lists match what each plan really gets.
+- **Placement:** new features go in a plan on purpose, and the free plan stays affordable.
+
+</details>
+
+<details>
+<summary><code>innovation</code>: What could make this feel slick?</summary>
+
+- **Less effort:** smart defaults, inference, or import in place of forms and setup steps.
+- **AI that saves work:** natural-language input, summaries, drafts, and suggestions.
+- **Proactive help:** noticing what someone is trying to do, and doing the next step.
+- **New technology:** passkeys, on-device AI, agent access, and real-time collaboration.
+- **What you get:** 3 to 5 ideas at most, each with its benefit, effort, and running cost.
+
+These are ideas, so they never block shipping.
+
+</details>
 
 ### `/loop-audit`
 
