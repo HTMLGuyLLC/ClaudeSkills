@@ -33,7 +33,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 2 | `performance` | Page load, perceived speed, query optimization, parallel calls, caching | `references/2-reliability.md` |
 | 2 | `resilience` | Retries, backoff, try/catch, timeouts, scaling | same |
 | 2 | `errors` | Proactive error handling and user-facing failure | same |
-| 2 | `data` | Migrations, integrity, concurrency, idempotency, versioning and merging | same |
+| 2 | `data` | Migrations, integrity, transactions and rollback, concurrency, idempotency, versioning and merging | same |
 | 3 | `logging` | Useful, structured, safe logs | `references/3-observability-testing.md` |
 | 3 | `alerting` | Failures reach a human | same |
 | 3 | `analytics` | Product events and funnels | same |

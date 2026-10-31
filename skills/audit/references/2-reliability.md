@@ -66,7 +66,11 @@ Proactive error handling means anticipating failure before a user reports it.
 ## data
 
 - **Migrations:** reversible or safely forward-only, safe on live traffic (no long locks), backfills handled, deployable before the code that needs them.
-- **Integrity:** constraints, foreign keys, and uniqueness in the database rather than only in app code. Transactions around multi-step writes.
+- **Integrity:** constraints, foreign keys, and uniqueness in the database rather than only in app code.
+- **Transactions and rollback:** a multi-step write either fully happens or leaves no trace. Ask what state is left if any step fails partway.
+  - Related writes share one transaction, and every error path rolls it back, including errors caught and handled in app code.
+  - A database rollback can't undo outside effects like a charge, an email, or an API call. Run those after the commit, for example through an outbox, or define how each one gets undone, such as a refund.
+  - A multi-step flow across services or jobs needs a way to undo or finish each step, and a failure partway can be resumed or cleaned up.
 - **Concurrency:** race conditions and check-then-act bugs.
 - **Idempotency:** most actions that change something should be safe to repeat, so a second request can't duplicate a payment, insert, email, or anything else. Walk each write and ask what happens on a double click, a refresh, a resend after a timeout, a redelivered webhook, or a re-run job.
   - Use whatever fits: an idempotency key, an upsert, a unique constraint, or a state check inside the same transaction. A repeat returns the first result rather than an error, where the caller can use it.

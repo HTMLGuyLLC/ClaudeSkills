@@ -84,8 +84,9 @@ These ideas must stay honest. A fake count, or a success message for something t
 /audit data
 ```
 
-Besides migrations and data rules, this checks two things:
+Besides migrations and data rules, this checks three things:
 
+- **Failures leave nothing half done:** if a step fails partway, everything rolls back, and charges or emails that a database can't undo run after the save or have their own way to be reversed.
 - **Repeats do no harm:** a double click, a retry, or a resent webhook can't charge someone twice or add a duplicate row.
 - **Edits don't overwrite each other:** if two people change the same record, the newer change isn't silently lost. Changes that don't overlap are merged, and real conflicts keep both versions so nothing the user typed disappears.
 
