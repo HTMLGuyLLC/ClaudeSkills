@@ -292,7 +292,7 @@ Local or low-stakes tools don't need all of this. Whether data really arrives ne
 - **Efficient use:** the cheapest model that works, with caching, batching, and output limits.
 - **Spend limits:** per-user and overall caps, so one user or a loop can't run up the bill.
 - **Plan margins:** usage is measured, and each plan's price covers its AI cost.
-- **Other spend:** costly queries, storage, bandwidth, email, SMS, and idle compute.
+- **Other spend:** costly queries, storage, bandwidth, email, SMS, and idle compute. If other sites could run up your bandwidth by embedding your files, it suggests hotlink protection, which is your choice to make.
 
 </details>
 

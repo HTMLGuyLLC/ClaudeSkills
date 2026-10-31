@@ -91,6 +91,8 @@ Use AI only when deterministic algorithms don't suffice. If a deterministic meth
 
 Also check non-AI spend: costly queries, unbounded storage, egress, email and SMS, per-seat tools, and compute that runs when idle.
 
+**Hotlinking:** when other sites can embed your public images, videos, or downloads, you pay for their bandwidth, and user uploads can turn into free file hosting. Some products want embedding, so this is a choice, not a defect. Raise it as Low or an Idea, and only when the files are large or popular, or bandwidth is a real cost. Referrer rules at the CDN are a simple deterrent, but they can break email, feeds, and link previews, and they aren't access control. Private files need signed links.
+
 **Don't flag:** AI used for work that truly needs it, such as open-ended language understanding or generation.
 
 ## delivery
