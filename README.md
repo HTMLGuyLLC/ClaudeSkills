@@ -78,6 +78,17 @@ This measures real speed, like page load and slow queries. It also looks at each
 
 These ideas must stay honest. A fake count, or a success message for something that failed, is reported as a problem. Timing can only be judged in a running app.
 
+**Check that repeats and simultaneous edits are safe:**
+
+```text
+/audit data
+```
+
+Besides migrations and data rules, this checks two things:
+
+- **Repeats do no harm:** a double click, a retry, or a resent webhook can't charge someone twice or add a duplicate row.
+- **Edits don't overwrite each other:** if two people change the same record, the newer change isn't silently lost. Changes that don't overlap are merged, and real conflicts keep both versions so nothing the user typed disappears.
+
 **Check that what you promise is still true:**
 
 ```text

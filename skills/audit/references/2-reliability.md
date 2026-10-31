@@ -67,6 +67,15 @@ Proactive error handling means anticipating failure before a user reports it.
 
 - **Migrations:** reversible or safely forward-only, safe on live traffic (no long locks), backfills handled, deployable before the code that needs them.
 - **Integrity:** constraints, foreign keys, and uniqueness in the database rather than only in app code. Transactions around multi-step writes.
-- **Concurrency:** race conditions, check-then-act bugs, lost updates, and double-charging or double-sending.
-- **Idempotency** for webhooks, payments, and retried jobs.
+- **Concurrency:** race conditions and check-then-act bugs.
+- **Idempotency:** most actions that change something should be safe to repeat, so a second request can't duplicate a payment, insert, email, or anything else. Walk each write and ask what happens on a double click, a refresh, a resend after a timeout, a redelivered webhook, or a re-run job.
+  - Use whatever fits: an idempotency key, an upsert, a unique constraint, or a state check inside the same transaction. A repeat returns the first result rather than an error, where the caller can use it.
+  - The database enforces it. A "does it exist yet?" check followed by an insert fails when two requests arrive together.
+  - A key belongs to the user's one intent. It's created before the first attempt and reused on every retry, and it's passed on to payment and email providers that accept one.
+- **Concurrent updates:** a save must not silently overwrite someone else's newer change. Check data that more than one user, tab, device, or background job can edit.
+  - Version the data with a version number, `updated_at`, or ETag, and make each write conditional on the version it read.
+  - Merge when you can. Send only the fields that changed, apply counters as increments and lists as adds and removes, and combine edits that don't overlap. Text that people edit together may need a CRDT or similar.
+  - When two changes truly conflict, keep both and let the user choose, or apply a rule the product has chosen on purpose. Never lose the user's input.
 - **Lifecycle:** deletion really deletes (or is deliberately soft), retention rules, and timezones, money, and precision stored correctly.
+
+**Don't flag:** idempotency on reads or on writes that are already safe to repeat, or versioning on data that only one writer can ever touch.
