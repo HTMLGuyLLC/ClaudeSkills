@@ -29,7 +29,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | `/audit src/checkout` | One folder |
 | `/audit all` | The whole repo |
 
-**Choose which topics to check.** It runs all 22 unless you pick some. The list below shows what each one covers.
+**Choose which topics to check.** It runs all 23 unless you pick some. The list below shows what each one covers.
 
 | Command | What it runs |
 |---|---|
@@ -159,6 +159,20 @@ Timing can only be judged in a running app.
 - **Silent failures:** a job that stops running sends no errors, so it needs a heartbeat.
 - **Noise:** each alert is worth acting on, and goes to someone who would act.
 - **Uptime:** production services have health checks and monitoring.
+
+</details>
+
+<details>
+<summary><code>tracing</code>: If something breaks, could you work out what happened?</summary>
+
+- **The 3am test:** it imagines your riskiest path failing for one customer, then tries to follow the trail from the alert to the cause. Each dead end is a finding.
+- **Following one request:** one ID links the browser, API, jobs, webhooks, and outside calls, and connects your logs, errors, and traces.
+- **APM:** speed and error rates for each route, job, and outside service, with slowest-case timings, queue backlogs, and signals like checkouts per minute.
+- **What changed:** deploys, migrations, feature flags, and config changes are recorded, and errors show their release and readable stack traces.
+- **Rebuilding the story:** record history, job and webhook results, why an automated decision was made, what an AI call did, and a safe view of a customer's state for support.
+- **Safe and affordable:** no secrets or needless personal data in traces, every error kept when sampling, and costs kept bounded.
+
+Local or low-stakes tools don't need all of this. Whether data really arrives needs a running app or access to your tools.
 
 </details>
 

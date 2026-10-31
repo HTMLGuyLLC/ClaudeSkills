@@ -533,5 +533,12 @@ bundles=$(printf '%s\n' "$bundle_rows" | cut -d'`' -f2 | sort)
 [ -n "$lenses" ] && [ "$lenses" = "$bundled" ] && pass || fail "bundles must cover every lens exactly once"
 [ -z "$(comm -12 <(printf '%s\n' "$lenses") <(printf '%s\n' "$bundles"))" ] && pass || fail "bundle name reuses a lens id"
 
+# --- The README explains every lens and gives the right count
+readme="$repo/README.md"
+for lens in $lenses; do
+  grep -qF "<summary><code>$lens</code>:" "$readme" && pass || fail "README is missing lens $lens"
+done
+expect "README lens count" "It runs all $(printf '%s\n' "$lenses" | wc -l | tr -d ' ') unless" "$(cat "$readme")"
+
 echo "$((total - failures))/$total passed"
 [ "$failures" = 0 ]

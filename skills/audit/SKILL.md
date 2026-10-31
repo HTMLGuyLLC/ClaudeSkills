@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance (real and perceived speed), resilience, error handling, logging, alerting, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, legal (including whether the privacy policy, terms, and public claims are still true), docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
+description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance (real and perceived speed), resilience, error handling, logging, alerting, tracing and APM, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, legal (including whether the privacy policy, terms, and public claims are still true), docs, consistency, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
 argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens or bundle,...] [--quick] [--fix]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scope.sh *)
@@ -36,6 +36,7 @@ Check a set of changes against every lens in the table below, then report only v
 | 2 | `data` | Migrations, integrity, transactions and rollback, concurrency, idempotency, versioning and merging | same |
 | 3 | `logging` | Useful, structured, safe logs | `references/3-observability-testing.md` |
 | 3 | `alerting` | Failures reach a human | same |
+| 3 | `tracing` | Tracing, APM, error context, and reconstructing what happened in production | same |
 | 3 | `analytics` | Product events and funnels | same |
 | 3 | `tests` | Unit, integration, performance tests | same |
 | 4 | `practices` | Framework-recommended approach, build vs. buy | `references/4-engineering.md` |
@@ -59,7 +60,7 @@ A bundle is a shortcut for one group's lenses. Bundles and lenses can be combine
 |---|---|
 | `protect` | `security`, `legal` |
 | `reliability` | `performance`, `resilience`, `errors`, `data` |
-| `observability` | `logging`, `alerting`, `analytics`, `tests` |
+| `observability` | `logging`, `alerting`, `tracing`, `analytics`, `tests` |
 | `engineering` | `practices`, `quality`, `cost`, `delivery` |
 | `experience` | `a11y`, `simplicity`, `consistency`, `docs`, `ux` |
 | `product` | `personas`, `plans`, `innovation` |
