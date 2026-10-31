@@ -1,4 +1,4 @@
-# Group 5: Accessibility, simplicity, consistency, docs, UX
+# Group 5: Accessibility, compatibility, simplicity, consistency, docs, UX
 
 ## a11y
 
@@ -16,6 +16,46 @@ Target WCAG 2.2 AA at minimum. Take AAA when it's low-hanging fruit.
 **AAA when cheap:** 7:1 contrast where the palette allows it, 44×44px targets, plain-language copy, no time limits, and no needless animation. Report these as Low or Idea, never as blockers.
 
 **How to check:** run axe or Lighthouse if the app can run, and use the keyboard yourself. Code review alone can't prove contrast or focus order, so mark those Not verified without a running app.
+
+## compatibility
+
+The project needs a written target for what it supports, and all code has to work on that target. This covers where the product runs. Keeping old APIs and saved data working is covered by `delivery`, and screen sizes by `ux`.
+
+**A target is set**
+
+Look for it in the `## Compatibility` section of `.claude/audit.md`, `browserslist`, the build and TypeScript `target`, `engines`, `.nvmrc`, `requires-python`, the iOS deployment target, Android `minSdk`, and the docs. Report a finding if it's missing, if these disagree, or if a tool that could read the target doesn't.
+
+The target states whatever applies:
+- **Browsers:** which ones and how far back, including Safari on iOS, in-app webviews, and email clients for HTML email.
+- **Devices and operating systems:** minimum iOS, Android, Windows, and macOS versions, chip architectures, and touch or mouse.
+- **Runtimes and data stores:** language, database, and service versions, the same across development, CI, and production.
+- **Scripts and CLIs:** shells, operating systems, and differences such as BSD and GNU tool flags.
+
+Base a proposed target on real usage data if the project has it, or otherwise on who its customers are. The target should also match any public claim, such as "works on every browser".
+
+**All code complies**
+
+Check each feature against the target using current data from MDN, Can I Use, or Baseline, not memory. Use `eslint-plugin-compat`, Stylelint compatibility rules, or similar if the project has them. On a diff, check what the change adds. On `all`, check the code and its dependencies.
+
+- **JavaScript:** build tools convert new syntax, but not new APIs, so APIs like `Object.groupBy` or `Array.prototype.toSorted` need a polyfill or a check.
+- **CSS:** newer features like `:has()`, container queries, nesting, `dvh`, and `oklch` need support or a fallback.
+- **Web platform:** `popover`, view transitions, the Clipboard API, service workers, and web push work differently across browsers, and iOS adds its own limits.
+- **Native:** newer APIs sit behind availability checks, such as `#available` or `SDK_INT`.
+- **Dependencies:** each package supports the target, including packages published as untranspiled modern code.
+- **Behavior differences:** date parsing, autoplay, file inputs, storage limits, and fonts can differ even where a feature exists.
+
+**Failing well**
+- Detect features rather than checking the browser's name.
+- Where a feature isn't essential, the page still works without it.
+- A browser below the target gets a clear message, not a blank page.
+
+**Not too far back:** a target older than the users needs costs real money. Flag polyfills and workarounds for versions outside the target, and targets that users don't justify.
+
+**Severity:** High when a main flow, such as signup or checkout, breaks on a supported target. Medium when a feature fails there. Low when a fallback works but looks worse.
+
+**How to check:** compatibility data shows what should work. To prove it, run the app on the oldest targets, using real devices, a device cloud, or Playwright's WebKit. Mark anything that wasn't run Not verified.
+
+**Don't flag:** new features with a working fallback, browsers outside the target, or a small internal tool with a short target that everyone uses.
 
 ## simplicity
 
@@ -130,7 +170,7 @@ Each public changelog, What's new panel, or release note has an audience. Work o
 
 **Reach**
 - **First run:** a new user reaches first value quickly, with guidance that doesn't block them.
-- **Cross-browser:** works on the browsers the product supports, including Safari on iOS.
+- **Cross-browser:** covered by `compatibility`.
 - **i18n:** strings not hardcoded if the product is translated, long-text and right-to-left layouts, and locale formats.
 - **SEO and sharing (public pages):** titles, descriptions, canonical URLs, sitemaps, structured data, and Open Graph images.
 

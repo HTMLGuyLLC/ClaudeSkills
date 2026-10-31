@@ -18,6 +18,9 @@ US and EU customers
 ## Admin panel
 In the acme-admin repo, next to this one
 
+## Compatibility
+Last 2 versions of Chrome, Edge, and Firefox. Safari and iOS 17+. Node 22.
+
 ## Known exceptions
 - `lodash@4` stays pinned until the v2 migration ships
 - Admin pages are exempt from i18n

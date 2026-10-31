@@ -96,7 +96,7 @@ Also check non-AI spend: costly queries, unbounded storage, egress, email and SM
 ## delivery
 
 - **Rollout:** risky changes sit behind a flag or staged rollout, and the change can be rolled back, including its data changes.
-- **Compatibility:** public APIs, webhooks, file formats, and saved data keep working, or there's a versioned migration. Old clients and cached pages still work during a deploy.
+- **Backward compatibility:** public APIs, webhooks, file formats, and saved data keep working, or there's a versioned migration. Old clients and cached pages still work during a deploy.
 - **Config:** new env vars are documented, in the example file, validated at startup, and set for every environment. Defaults are safe.
 - **CI/CD and environments:** the build passes, deploy order is safe, and staging matches production where it matters.
 - **Versioning:** version and changelog updates follow the project's release process.

@@ -29,7 +29,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | `/audit src/checkout` | One folder |
 | `/audit all` | The whole repo |
 
-**Choose which topics to check.** It runs all 25 unless you pick some. The list below shows what each one covers.
+**Choose which topics to check.** It runs all 26 unless you pick some. The list below shows what each one covers.
 
 | Command | What it runs |
 |---|---|
@@ -251,7 +251,7 @@ Local or low-stakes tools don't need all of this. Whether data really arrives ne
 <summary><code>delivery</code>: Can this ship safely, and be undone?</summary>
 
 - **Rollout:** risky changes sit behind a flag, and can be rolled back along with their data.
-- **Compatibility:** APIs, webhooks, and saved data keep working, including during a deploy.
+- **Backward compatibility:** APIs, webhooks, and saved data keep working, including during a deploy.
 - **Config:** new settings are documented, checked at startup, and set everywhere.
 - **Environments:** the build passes, deploy order is safe, and staging matches production where it counts.
 - **Versioning:** versions and the changelog follow your release process.
@@ -271,6 +271,20 @@ Local or low-stakes tools don't need all of this. Whether data really arrives ne
 - **Size and motion:** large enough targets, text that resizes, and reduced-motion settings respected.
 
 Contrast and focus order need a running app to confirm.
+
+</details>
+
+<details>
+<summary><code>compatibility</code>: Is there a clear target, and does all the code work on it?</summary>
+
+- **A set target:** browsers, devices, operating systems, and runtimes are written down in one place, and your tools and docs agree with it.
+- **Choosing one:** if there isn't a target, it proposes one from your usage data or customers. You make the final call, even with `--fix`.
+- **Code complies:** new JavaScript APIs, CSS, web features, and native APIs are checked against current browser support data, not memory.
+- **Dependencies:** each package works on your target too.
+- **Failing well:** features are detected properly, and an unsupported browser gets a clear message or a working fallback, not a blank page.
+- **Not too far back:** it flags polyfills and workarounds for versions you don't need to support.
+
+Proving it works needs a run on your oldest targets, and anything that wasn't run is marked Not verified.
 
 </details>
 
@@ -316,7 +330,7 @@ Contrast and focus order need a running app to confirm.
 - **Layout:** clear hierarchy, few choices at once, and people always know where they are.
 - **Light and dark mode:** both are designed, including logos, charts, and emails, with no flash of the wrong theme.
 - **Mobile:** every width from 320 up, thumb reach, no hover-only features, and forms that work with the on-screen keyboard.
-- **States and reach:** loading, empty, error, and offline states, first-time use, other browsers, translation, and SEO.
+- **States and reach:** loading, empty, error, and offline states, first-time use, translation, and SEO.
 
 Judging how things look needs a running app or screenshots.
 
