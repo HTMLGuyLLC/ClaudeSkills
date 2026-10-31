@@ -41,8 +41,24 @@ Mistakes here tend to expose every account at once, so any change touching this 
 - Injection: SQL, NoSQL, command, template, path traversal, and XSS, including `dangerouslySetInnerHTML` and unsanitized markdown.
 - Cryptography: current algorithms, no home-grown crypto, encryption in transit and at rest, safe randomness for tokens.
 - Misconfiguration: CORS, CSRF, security headers and CSP, debug modes, verbose errors, default credentials, public buckets.
-- SSRF, unsafe deserialization, open redirects, unsafe file uploads, webhook signature checks.
+- SSRF, unsafe deserialization, open redirects, webhook signature checks.
 - Formula injection in CSV and spreadsheet exports.
+
+**File uploads**
+
+Everything about an uploaded file comes from the user, so trust none of it. Read every upload path in full, including scripts, background jobs, and direct-to-storage flows.
+
+- **Filenames:** never use a provided name to build a path. Generate a random name on the server. Keep the original only as sanitized display text, safe from path traversal, control characters, and double extensions like `invoice.php.jpg`.
+- **File type:** the extension and `Content-Type` are claims. Check the real content against an allowlist, and confirm the extension matches. Blocklists aren't enough. SVG and HTML can run scripts, so they need sanitizing or forced download.
+- **Size and count:** limits are enforced on the server before the whole file is read, along with per-user quotas. Image dimensions and archives are checked too, to stop decompression bombs. Archive paths are checked before extracting.
+- **Storage:** files live outside the web root, or in a separate bucket that can't execute anything. Names can't be guessed, and files are private by default.
+- **Access:** each download checks the user's permission, and signed links expire. A public link never exposes a private file.
+- **Serving:** user files come from a separate domain where possible, with the verified type, `X-Content-Type-Options: nosniff`, and `Content-Disposition: attachment` unless they're safe to show inline.
+- **Processing:** images are re-encoded, which also removes location and other metadata. Image, PDF, and office parsers are patched and isolated where possible, and XML parsers have external entities turned off. Files shared between users are scanned for malware.
+- **Direct uploads:** signed upload URLs are limited by key, type, size, and time. A file is validated after upload, before anything trusts it.
+- **Abuse and cleanup:** upload routes need login where the product allows it, rate limits, and removal of abandoned files.
+
+A provided filename reaching a file path, or an uploaded file that can run on the server or in another user's browser, is at least High.
 - Row-level security: on Supabase or similar, every table has correct policies and explicit grants, and privileged keys never reach the client.
 
 **PCI**

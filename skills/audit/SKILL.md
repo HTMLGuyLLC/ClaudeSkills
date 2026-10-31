@@ -134,8 +134,8 @@ If the `personas` skill can't run, mark the lens Not verified.
 |---|---|
 | Up to 3 files | 1, covering all applicable lenses |
 | Up to 15 files | 3: groups 1 and 2, groups 3 and 4, groups 5 and 6 |
-| Larger, or `all` | 1 per group with applicable lenses, plus 1 just for `ux` |
-| Any size, with lenses or bundles selected | No more than 1 per group selected |
+| Larger, or `all` | 1 per group with applicable lenses, with two groups split: `ux` gets its own agent, and group 2 gets 2 (`correctness`, `data`, `migrations`; and `performance`, `resilience`, `errors`, `operations`) |
+| Any size, with lenses or bundles selected | No more than 1 per group selected, or the split agents above on a larger scope |
 
 **Standard:** spawn the agents all in the same message, using the Opus model because this is judgment work. If an agent fails or is blocked, don't resend the same request. Mark its lenses Not verified, or review them yourself and say that review wasn't independent. Give each agent this brief, filled in:
 

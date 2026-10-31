@@ -51,7 +51,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 
 - Its scanners, your lint, and your tests all run at the same time.
 - For anything over 3 files, several reviewers work side by side and share one set of project notes, so they don't repeat the same research.
-- Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 7. More reviewers means more tokens, and it tells you the estimate before it starts.
+- Changes of 4 to 15 files use 3 reviewers, and bigger ones use up to 8. More reviewers means more tokens, and it tells you the estimate before it starts.
 - Separate agents double-check a long list of serious findings.
 - `--fix` makes unrelated fixes side by side.
 
@@ -68,9 +68,9 @@ Every topic gets a result, so nothing is skipped silently. Click one to see what
 
 - **Permissions:** every request checks on the server who you are and what you own, and new routes start closed.
 - **Login and sessions:** rate limits, safe password resets, MFA, OAuth checks, secure cookies, and a logout that really ends the session. Any change here gets a line-by-line read of the whole flow.
-- **Credentials:** strong password hashing, secrets kept out of code and logs, and keys with narrow access that can be rotated.
+- **Credentials and card data:** strong password hashing, secrets kept out of code and logs, keys with narrow access that can be rotated, and PCI rules that keep card numbers out of logs and databases.
+- **File uploads:** provided filenames and file types are never trusted. It checks real file content against an allowlist, random server-side names, size limits, private storage, safe serving, and malware scans for shared files.
 - **Common attacks:** the OWASP Top 10 lists for web, API, and AI apps, such as injection, XSS, SSRF, and formulas hidden in CSV exports, plus database access rules.
-- **Card data:** PCI rules, and whether card numbers can reach your logs, database, or analytics.
 - **Dependencies and abuse:** known vulnerabilities, outdated or fake packages, spam, free plan abuse, prompt injection, and moderation for products with user content.
 
 </details>

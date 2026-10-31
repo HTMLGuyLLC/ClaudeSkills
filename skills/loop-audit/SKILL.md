@@ -32,7 +32,7 @@ Read `${CLAUDE_SKILL_DIR}/../audit/SKILL.md` first. If it's missing, stop and te
 4. If the code isn't the user's, such as someone else's PR, confirm before running its lint, tests, or binaries each round.
 5. Create the ledger at `.claude/audits/loop-YYYY-MM-DD-<label>.md`, and add `.claude/audits/` to the git exclude as the audit skill describes. Do this while the user is present, because `.claude/` and `.git/` are protected paths that may prompt for approval. If they prompt, tell the user that an unattended run needs them approved for this session.
 6. Record a restore point with `git stash create`. This changes nothing and prints a commit hash for tracked changes; if it prints nothing, use the hash from `git rev-parse HEAD`. That doesn't cover untracked files, so copy any in the scope to `.claude/audits/loop-YYYY-MM-DD-<label>-restore/`, keeping their paths.
-7. State the worst-case cost before Round 1: agents per round from the audit skill's sizing table, times max rounds, times about 120k tokens. At full size that's about 4.2M tokens, plus any verifier and fix agents.
+7. State the worst-case cost before Round 1: agents per round from the audit skill's sizing table, times max rounds, times about 120k tokens. At full size that's about 4.8M tokens, plus any verifier and fix agents.
 8. If the `personas` lens applies, settle the personas now, as audit Step 4 describes, while the user is present. If the list isn't saved, copy it to the ledger's `Personas` section. Every round uses that same list, and rounds never stop to ask about personas.
 
 ## The ledger
