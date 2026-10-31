@@ -49,6 +49,7 @@ done | while IFS=$'\t' read -r cwd pid status; do
   kill -0 "$pid" 2>/dev/null && printf '%s\t%s\n' "$cwd" "Claude session $pid ($status)" >> "$tmp/live"
 done
 
+command -v lsof >/dev/null || echo "warn: lsof is missing, so running processes can't be seen"
 lsof -d cwd -Fcn 2>/dev/null | awk '
   /^c/ { name = substr($0, 2) }
   /^n/ { print substr($0, 2) "\t" name }' >> "$tmp/live"
@@ -74,7 +75,8 @@ matching() { awk -F'\t' -v p="$2" '$1 == p || index($1, p "/") == 1' "$1"; }
 
 transcript_recent() {
   [ "$recent_hours" -gt 0 ] || return 1
-  local dir="$HOME/.claude/projects/$(printf '%s' "$1" | sed 's/[^A-Za-z0-9-]/-/g')"
+  local dir
+  dir="$HOME/.claude/projects/$(printf '%s' "$1" | sed 's/[^A-Za-z0-9-]/-/g')"
   [ -d "$dir" ] && [ -n "$(find "$dir" -maxdepth 1 -name '*.jsonl' -mmin "-$recent_minutes" -print -quit 2>/dev/null)" ]
 }
 
@@ -124,7 +126,7 @@ count_active=0 count_pool=0 count_merged=0 count_ask=0 count_unknown=0
 
 report_worktree() {
   local repo=$1 base=$2 path=$3 head=$4 branch=$5 state=$6
-  local class= why= dirty unique local_only stray_files chat_line chat_active chat_id chat_title live size
+  local class='' why='' dirty unique local_only stray_files chat_line chat_active chat_id chat_title live size
   how=
   pr_note=
 
@@ -184,7 +186,7 @@ report_worktree() {
   echo "last_commit: $(git -C "$path" log -1 --format='%cs %s' 2>/dev/null | cut -c1-100)"
   echo "size: $size"
   [ -n "$pr_note" ] && echo "pr: $pr_note"
-  [ -n "$chat_id" ] && echo "chat: $chat_id $(date -r $((chat_active / 1000)) +%F 2>/dev/null) $chat_title"
+  [ -n "$chat_id" ] && echo "chat: $chat_id $(date -r $((chat_active / 1000)) +%F 2>/dev/null || date -d "@$((chat_active / 1000))" +%F 2>/dev/null) $chat_title"
   if [ -n "$stray_files" ]; then
     echo "ignored_files: $(printf '%s\n' "$stray_files" | wc -l | tr -d ' ') ($(printf '%s\n' "$stray_files" | head -n 5 | paste -sd ',' - | sed 's/,/, /g'))"
   fi

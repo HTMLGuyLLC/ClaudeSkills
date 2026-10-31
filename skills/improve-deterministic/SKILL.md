@@ -76,7 +76,7 @@ If the target could mean several things, ask. If `.improve/<slug>/` exists, resu
 
 ## Step 2: Set up the workspace
 
-1. **Protect the folder first.** Add `.improve/` to `.git/info/exclude`, which applies at once to every worktree. Create the folder with `chmod 700`. Then confirm with `git check-ignore -q .improve/<slug>/data/x`. If that fails, stop, and write no data.
+1. **Protect the folder first.** Add `.improve/` to `$(git rev-parse --git-path info/exclude)`, which applies at once to every worktree. Create the folder with `chmod 700`. Then confirm with `git check-ignore -q .improve/<slug>/data/x`. If that fails, stop, and write no data.
 2. **Make the protection permanent.** The first commit on the branch below adds `.improve/` to `.gitignore`, so other clones are covered too.
 3. **Point future work here.** The same commit adds this to `AGENTS.md`, or to `CLAUDE.md` if that's what the project uses:
 

@@ -83,12 +83,15 @@ if [ -f package.json ]; then
     tool npm-outdated "npm" npm outdated
   fi
 fi
-if [ -f requirements.txt ]; then
+if [ -f requirements.txt ] || [ -f pyproject.toml ]; then
   found_manifest=1
-  tool pip-audit "pipx install pip-audit" pip-audit -r requirements.txt
-elif [ -f pyproject.toml ]; then
-  found_manifest=1
-  tool pip-audit "pipx install pip-audit" pip-audit .
+  if [ -n "$no_project_code" ]; then
+    note "skipped  pip-audit (--no-project-code; it can run the project's build code)"
+  elif [ -f requirements.txt ]; then
+    tool pip-audit "pipx install pip-audit" pip-audit -r requirements.txt
+  else
+    tool pip-audit "pipx install pip-audit" pip-audit .
+  fi
 fi
 if [ -f Cargo.toml ]; then
   found_manifest=1
@@ -107,7 +110,11 @@ if [ -f Gemfile.lock ]; then
 fi
 if [ -f composer.lock ]; then
   found_manifest=1
-  tool composer-audit "composer" composer audit
+  if [ -n "$no_project_code" ]; then
+    note "skipped  composer-audit (--no-project-code; it can load the project's plugins)"
+  else
+    tool composer-audit "composer" composer audit
+  fi
 fi
 [ -n "$found_manifest" ] || note "no supported manifest at the root (npm, Python, Rust, Go, Ruby, PHP); check dependencies by hand if the project has any"
 

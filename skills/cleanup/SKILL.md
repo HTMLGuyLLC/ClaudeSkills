@@ -1,6 +1,6 @@
 ---
 name: cleanup
-description: Reviews git worktrees across every repo Claude has worked in, removes the ones whose work is merged and that nothing is using, and asks before touching anything unfinished. Also clears merged branches, dead worktree records, stray files, and finished chats. Use when the user says "/cleanup", "clean up worktrees", "clear out old worktrees", or "what can I delete".
+description: Reviews git worktrees across every repo Claude has worked in, removes the ones whose work is merged and that nothing is using, and asks before touching anything unfinished. Also clears merged branches, dead worktree records, stray files, and finished chats. Only runs when typed as /cleanup.
 argument-hint: "[--dry-run] [--no-ask] [repo paths]"
 disable-model-invocation: true
 allowed-tools:
@@ -59,7 +59,7 @@ For `--dry-run`, skip to Step 5 and describe what would have happened.
 
 ## Step 2: Do the safe removals
 
-These need no approval:
+These need no approval, unless the scan printed a `warn:` line. Then something in use might not show, so treat `merged` worktrees as unfinished work and ask first:
 
 ```bash
 ${CLAUDE_SKILL_DIR}/scripts/remove.sh worktree <path>        # each class: merged

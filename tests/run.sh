@@ -93,6 +93,8 @@ expect "no CI at all" "ready: yes" "$(state "$plain" "$healthy" none 1)"
 expect "no CI state" "checks_state: no-ci" "$(state "$plain" "$healthy" none 1)"
 expect "tag-only workflow isn't PR CI" "ready: yes" "$(state "$tags" "$healthy" none 1)"
 expect "CI not registered yet" "no checks on this commit yet" "$(state "$ci" "$healthy" none 1)"
+mkdir -p "$ci/sub"
+expect "CI found from a subfolder" "no checks on this commit yet" "$(state "$ci/sub" "$healthy" none 1)"
 expect "gh error fails closed" "checks unknown" "$(state "$plain" "$healthy" error 1)"
 reject "gh error isn't ready" "ready: yes" "$(state "$plain" "$healthy" error 1)"
 expect "pending person blocks" "review pending from alice" \
@@ -200,6 +202,11 @@ out=$(cd "$s" && touch package.json && mkdir -p node_modules/.bin &&
   chmod +x node_modules/.bin/knip && bash "$scanners" "$work/scan-safe" --no-project-code 2>&1)
 expect "project code skipped" "skipped  knip (--no-project-code)" "$out"
 [ ! -e "$work/ran" ] && pass || fail "--no-project-code ran a project binary"
+out=$(cd "$s" && touch requirements.txt composer.lock &&
+  bash "$scanners" "$work/scan-safe-deps" --no-project-code 2>&1)
+expect "pip-audit skipped" "skipped  pip-audit (--no-project-code" "$out"
+expect "composer audit skipped" "skipped  composer-audit (--no-project-code" "$out"
+rm -f "$s/requirements.txt" "$s/composer.lock"
 
 # --- personas: find what a project already says
 p=$(new_repo)
@@ -248,12 +255,12 @@ reject "skips dependencies outside git" "node_modules" "$out"
 d=$(new_repo)
 mkdir -p "$d/sub"
 today=$(date +%F)
-out=$(cd "$d/sub" && bash "$debate_path" 'What goes on the Bills page?' 2>&1)
-expect "debate path from a subfolder" ".claude/debates/$today-what-goes-on-the-bills-page.md" "$out"
+out=$(cd "$d/sub" && bash "$debate_path" 'What goes on the Pricing page?' 2>&1)
+expect "debate path from a subfolder" ".claude/debates/$today-what-goes-on-the-pricing-page.md" "$out"
 [ -f "$out" ] && pass || fail "debate path should be reserved"
 expect "debate reports stay out of git" ".claude/debates/" "$(cat "$d/.git/info/exclude")"
-out=$(cd "$d" && bash "$debate_path" 'What goes on the Bills page?' 2>&1)
-expect "debate never reuses a name" "bills-page-2.md" "$out"
+out=$(cd "$d" && bash "$debate_path" 'What goes on the Pricing page?' 2>&1)
+expect "debate never reuses a name" "pricing-page-2.md" "$out"
 (cd "$d" && bash "$debate_path" one >/dev/null && bash "$debate_path" two >/dev/null)
 [ "$(grep -cxF '.claude/debates/' "$d/.git/info/exclude")" = 1 ] && pass || fail "exclude line should appear once"
 out=$(cd "$d" && bash "$debate_path" '../../etc/passwd' 2>&1)
@@ -464,6 +471,7 @@ expect "main is protected" "is the main branch" "$(rm_tree branch "$r" main --ap
 
 expect "stray needs approval" "need approval" "$(rm_tree stray "$r/.claude/worktrees/build.log")"
 expect "stray stays in the worktrees folder" "isn't under" "$(rm_tree stray "$r/a.txt" --approved)"
+expect "stray can't climb out with .." "can't contain .." "$(rm_tree stray "$r/.claude/worktrees/.." --approved)"
 touch "$r/.claude/worktrees/leftover/.git"
 expect "stray can't be a repo" "git worktree or repo" "$(rm_tree stray "$r/.claude/worktrees/leftover" --approved)"
 expect "stray removed" "removed:" "$(rm_tree stray "$r/.claude/worktrees/build.log" --approved)"

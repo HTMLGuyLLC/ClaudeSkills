@@ -1,7 +1,6 @@
 name: Test
 
 on:
-  pull_request:
   push:
     branches: [main]
 
@@ -12,6 +11,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - run: shellcheck -S warning install.sh tests/run.sh skills/*/scripts/*.sh
       - run: bash tests/run.sh

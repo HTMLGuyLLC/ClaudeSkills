@@ -3,6 +3,9 @@ name: loop-audit
 description: Repeatedly runs /audit, fixes what it finds, and audits again until only rare, low-priority edge cases remain. Only runs when typed as /loop-audit.
 argument-hint: "[audit scope] [lens or bundle,...] [--max n]"
 disable-model-invocation: true
+allowed-tools:
+  - Bash(${CLAUDE_SKILL_DIR}/../audit/scripts/scope.sh *)
+  - Bash(${CLAUDE_SKILL_DIR}/../audit/scripts/scanners.sh *)
 ---
 
 # Loop audit
@@ -11,7 +14,7 @@ Audit, fix, and repeat until a full audit finds nothing worth fixing. Everything
 
 **Arguments:** $ARGUMENTS
 
-Read `${CLAUDE_SKILL_DIR}/../audit/SKILL.md` first. Read it again at the start of any round where you can't see it in your context, because compaction may have removed it. In that file, `${CLAUDE_SKILL_DIR}` means the `audit` folder. Round 1 follows its Steps 2 to 6 at standard depth, and later rounds reuse Step 2's `context.md`. `--quick` isn't accepted here, because it can't see Medium findings and so can't prove the stop condition.
+Read `${CLAUDE_SKILL_DIR}/../audit/SKILL.md` first. If it's missing, stop and tell the user to install the `audit` skill. Read it again at the start of any round where you can't see it in your context, because compaction may have removed it. In that file, `${CLAUDE_SKILL_DIR}` means the `audit` folder. Round 1 follows its Steps 2 to 6 at standard depth, and later rounds reuse Step 2's `context.md`. `--quick` isn't accepted here, because it can't see Medium findings and so can't prove the stop condition.
 
 ## Rules
 

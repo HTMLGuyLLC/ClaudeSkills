@@ -49,7 +49,7 @@ if [ -z "$checks" ]; then
   checks=$'checks_passed: 0\nchecks_failed: \nchecks_pending: '
   if ! grep -q 'no checks reported' "$stderr_file"; then
     checks_state=unknown
-  elif [ -d .github/workflows ] && grep -rqE 'pull_request|branches:' .github/workflows 2>/dev/null; then
+  elif workflows="$(git rev-parse --show-toplevel 2>/dev/null)/.github/workflows" && [ -d "$workflows" ] && grep -rqE 'pull_request|branches:' "$workflows" 2>/dev/null; then
     checks_state=not-registered
   else
     checks_state=no-ci

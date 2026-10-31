@@ -16,7 +16,7 @@ die() { echo "refused: $*" >&2; exit 1; }
 field() { printf '%s\n' "$1" | sed -n "s/^$2: //p" | head -n 1; }
 
 remove_worktree() {
-  local path=${1:-} approved=false changes= delete_branch=false
+  local path=${1:-} approved=false changes='' delete_branch=false
   [ -n "$path" ] || die "no worktree given"
   shift
   while [ $# -gt 0 ]; do
@@ -117,6 +117,7 @@ remove_stray() {
   local path=${1:-} approved=${2:-}
   [ "$approved" = --approved ] || die "stray files need approval"
   case "$path" in
+    */../* | */..) die "$path can't contain .." ;;
     */.claude/worktrees/*) ;;
     *) die "$path isn't under .claude/worktrees" ;;
   esac

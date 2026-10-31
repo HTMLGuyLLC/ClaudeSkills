@@ -1,6 +1,8 @@
 # Claude Skills
 
-Custom Claude Code skills, kept here so they're tracked and can be restored on any machine. A skill is a command you type in Claude Code, like `/audit`.
+Free skills for [Claude Code](https://claude.com/claude-code). A skill is a command you type in Claude Code, like `/audit`.
+
+Use them or fork them as you like. This repo doesn't take issues or pull requests, and it comes with no support. See [Install](#install) to get started.
 
 | Skill | In one line |
 |---|---|
@@ -152,7 +154,7 @@ The first time the `personas` check runs in a project, it uses `/personas` to wo
 **Have them debate a decision:**
 
 ```text
-/personas debate what should be included in the bills page
+/personas debate what should be included in the pricing page
 ```
 
 ```text
@@ -160,7 +162,7 @@ The first time the `personas` check runs in a project, it uses `/personas` to wo
 ```
 
 ```text
-/personas debate would it be useful to add shared budgets
+/personas debate would it be useful to add team workspaces
 ```
 
 The personas each give their view alone, argue with each other, then vote on a proposal. You get a recommendation, or an honest "they couldn't agree". The result shows who still disagrees and what a person needs to decide. Everyone reads the same saved fact sheet, which keeps the debate fair and saves tokens. A full report goes in `.claude/debates/`.
@@ -213,7 +215,7 @@ You can use `patch`, `minor`, `major`, or an exact version.
 
 ### `/improve-deterministic`
 
-**What it does:** Improves plain code or rules, like a spam filter or a bill categorizer, by testing them against real examples. AI helps while you develop, but the finished logic has no AI in it, so it's cheap and predictable to run. It keeps a change only if the score really improves. Big labeling jobs run in parallel batches, and unrelated fixes can be tried side by side. Each one is still tested alone before it's kept.
+**What it does:** Improves plain code or rules, like a spam filter or a support ticket sorter, by testing them against real examples. AI helps while you develop, but the finished logic has no AI in it, so it's cheap and predictable to run. It keeps a change only if the score really improves. Big labeling jobs run in parallel batches, and unrelated fixes can be tried side by side. Each one is still tested alone before it's kept.
 
 **Improve something:**
 
@@ -224,7 +226,7 @@ You can use `patch`, `minor`, `major`, or an exact version.
 **Stop at a score or a number of rounds (the default limit is 10 rounds):**
 
 ```text
-/improve-deterministic the bill categorizer --target 95 --max 5
+/improve-deterministic the ticket sorter --target 95 --max 5
 ```
 
 **Remove its test data when you're done:**
@@ -254,7 +256,7 @@ Its data stays in a `.improve/` folder that git ignores. That folder may hold pr
 **Check one repo:**
 
 ```text
-/cleanup ~/Web/my-app
+/cleanup ~/code/my-app
 ```
 
 **Do only the safe removals, and list the rest for later:**
@@ -263,39 +265,43 @@ Its data stays in a `.improve/` folder that git ignores. That folder may hold pr
 /cleanup --no-ask
 ```
 
-Commits that only a detached worktree holds are saved to a `rescue/` branch before it's removed. If you remove unfinished work and keep it, the branch stays and uncommitted changes go to a stash. It never deletes remote branches or chat history. Full detection needs the Claude desktop app on a Mac, and it works from `git` alone elsewhere.
+Commits that only a detached worktree holds are saved to a `rescue/` branch before it's removed. If you remove unfinished work and keep it, the branch stays and uncommitted changes go to a stash. It never deletes remote branches or chat history. Full detection needs the Claude desktop app on a Mac, and it works from `git` alone elsewhere. If `lsof` is missing, it can't see running processes, so it asks before removing anything.
 
-## Set up a machine
+## Install
 
-This repo is private, so sign in to GitHub first. `/release` and `/audit pr` also need `gh`.
-
-```bash
-brew install gh
-```
+You need [Claude Code](https://claude.com/claude-code) and `git`. `/cleanup` also needs `jq`. Download the repo, or your own fork of it:
 
 ```bash
-gh auth login
+git clone https://github.com/HTMLGuyLLC/ClaudeSkills.git ~/ClaudeSkills
 ```
+
+Then link the skills into Claude Code:
 
 ```bash
-gh auth setup-git
+~/ClaudeSkills/install.sh
 ```
+
+`install.sh` links each skill into `~/.claude/skills/`, so edits in the repo apply right away. It never replaces a folder, a file, or a link that points somewhere else. It lists those and exits with an error so you can move them aside. The links point at this folder, so keep it where it is.
+
+### Update
 
 ```bash
-git clone https://github.com/HTMLGuyLLC/ClaudeSkills.git ~/Web/ClaudeSkills
+git -C ~/ClaudeSkills pull
 ```
 
-```bash
-~/Web/ClaudeSkills/install.sh
-```
+Run `install.sh` again if a new skill was added.
 
-`install.sh` links each skill into `~/.claude/skills/`, so edits here apply right away. The live skills follow the checked-out branch, so keep this repo on `main`. Run it again after adding a skill. It never replaces a folder, a file, or a link that points somewhere else. It lists those and exits with an error so you can move them aside.
+### Optional tools
+
+`/release` and `/audit pr` need the [GitHub CLI](https://cli.github.com), signed in with `gh auth login`.
 
 `/audit` uses more scanners if they're installed. None are required:
 
 ```bash
 brew install gitleaks osv-scanner semgrep shellcheck
 ```
+
+Without Homebrew, see each tool's install page.
 
 ## Add a skill
 
@@ -308,4 +314,8 @@ To remove a skill, delete its folder here and its link in `~/.claude/skills/`.
 
 ## Tests
 
-`tests/run.sh` checks the scripts offline, using a stub `gh`, temporary repos, and a temporary `HOME`. It needs only `git` and `jq`, and CI runs it on every PR.
+`tests/run.sh` checks the scripts offline, using a stub `gh`, temporary repos, and a temporary `HOME`. It needs only `git` and `jq`, and CI runs it on every push.
+
+## License
+
+[MIT](LICENSE)

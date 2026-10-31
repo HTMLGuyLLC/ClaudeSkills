@@ -31,7 +31,7 @@ Restate it neutrally in one line, and name its type:
 | Type | Example | Decides |
 |---|---|---|
 | Decide | Would it be useful to add X? | Build, build smaller, or don't build |
-| Design | What should be included in the bills page? | What's in, what's out, and in what order |
+| Design | What should be included in the pricing page? | What's in, what's out, and in what order |
 | Improve | How can we improve the homepage? | Which changes, ranked |
 
 Then find the subject in the project. If the wording could mean two different things and the answer would change, ask one sharp question. Otherwise pick the likely meaning and state it. If the subject doesn't exist yet, say so and debate it as something new.
