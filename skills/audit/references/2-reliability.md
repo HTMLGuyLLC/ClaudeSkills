@@ -8,6 +8,23 @@
 - Images and fonts: modern formats, sizes, lazy loading, `font-display`.
 - Server rendering, static generation, and caching used where the framework supports them.
 
+**Perceived speed**
+
+When a wait can't be removed, it should still feel short. Walk each wait a user can see and ask which of these ideas would shorten it. The examples show the idea and aren't a fixed list, so apply it to whatever this product does, and flag a noticeable wait where one clearly fits and isn't used.
+- **Answer before the work finishes:** the UI shows the expected result right away and the real work catches up behind it, as with a like, a save, or a reorder. A failure rolls back and tells the user. Anything hard to undo, such as a payment, send, or delete, shows a pending state instead.
+- **Show the shape first:** the user sees something solid straight away, with the real content filling in, such as a skeleton of the layout rather than a blank page or a lone spinner. It matches the final shape so nothing jumps, and very short waits show nothing so it doesn't flash.
+- **Show a cheap version first:** a small stand-in appears while the full thing loads, such as a blurred 1 KB image preview, a cached copy, a low-resolution chart, or the first rows of a report.
+- **Shape the wait:** the ending decides how long a wait feels, so progress should start slow and finish fast, never stall near the end, and reach 100% only when the work is done.
+- **Work while the user is busy with something else:** any time they're reading, typing, or deciding, do the work they'll need next, so the final step feels instant. Upload the file while they write the caption, parse or look up the first field while they type the second, prepare the next step while they read this one, or prefetch the likely next page. Throw away work that the user's changes make stale, cancel and delete what they abandon, and don't spend AI or other paid costs on steps they may never reach.
+- **Show the work:** a long wait tells the user what's happening, such as live counts, the current step, or partial results as they arrive, rather than a static "Loading".
+
+These ideas change how a wait feels, never what's true. Each of these is a finding:
+- A success shown for something that failed, with no rollback.
+- A made-up count, or a progress bar on a timer with no link to the real work.
+- A loading state screen readers can't detect, or motion that ignores `prefers-reduced-motion`.
+
+**How to check:** throttle the network and CPU in the running app, then try the main actions and watch what appears and when. Force a failed request to test rollback. Timing and feel can't be proven from code, so mark them Not verified without a running app.
+
 **Query optimization**
 - N+1 queries, `SELECT *`, missing indexes on filter, join, and sort columns, unbounded results with no pagination, work done in app code that the database should do.
 - Slow paths inside hot loops, and long transactions holding locks.
@@ -22,7 +39,7 @@
 - Work on the request path that belongs in a background job.
 - Memory leaks, large payloads, missing compression, needless re-renders, unvirtualized long lists.
 
-**Don't flag:** micro-optimizations on cold paths, or speculative caching that adds more risk than it saves.
+**Don't flag:** micro-optimizations on cold paths, speculative caching that adds more risk than it saves, or perceived-speed tricks for waits users don't notice or a product with no UI.
 
 ## resilience
 

@@ -111,7 +111,7 @@ If these live outside the repo, list what needs updating and mark it Not verifie
 - Loading, empty, error, success, partial, offline, and long-content cases are all designed. Empty states lead to the next action.
 - Controls show hover, focus, pressed, disabled, and selected states.
 - Forms and flows have a clear next action, undo or confirmation for destructive actions, no lost work, and feedback within 100ms.
-- Slow work feels fast: skeletons, progress, optimistic updates, and no layout shift as content loads.
+- No layout shift as content loads. How fast waits feel is covered by `performance`.
 - Motion explains what changed, and stays short.
 
 **Reach**

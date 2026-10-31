@@ -61,6 +61,23 @@ Custom Claude Code skills, kept here so they're tracked and can be restored on a
 
 This checks what catches the eye, whether the main buttons push people toward the key actions, light and dark mode, and mobile at every screen size. It also covers layout, loading and error states, and first-time use. It needs a running app or screenshots to judge how things look.
 
+**Check that your app is fast, and feels fast when it can't be:**
+
+```text
+/audit performance
+```
+
+This measures real speed, like page load and slow queries. It also looks at each wait a user can see and asks what would make it feel shorter. The ideas apply to whatever your product does, and these are only examples:
+
+- **Answer before the work finishes:** a like button responds right away and saves in the background.
+- **Show the shape first:** a feed shows its layout, then the posts.
+- **Show a cheap version first:** a large photo shows a tiny blurred preview.
+- **Shape the wait:** a progress bar starts slow and finishes fast.
+- **Work while the user is busy:** a file uploads while you write the caption, or your first field is parsed while you type the second.
+- **Show the work:** a long search shows what it's doing as it goes.
+
+These ideas must stay honest. A fake count, or a success message for something that failed, is reported as a problem. Timing can only be judged in a running app.
+
 **Check that what you promise is still true:**
 
 ```text
