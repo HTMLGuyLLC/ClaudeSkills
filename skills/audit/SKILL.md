@@ -1,6 +1,6 @@
 ---
 name: audit
-description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance (real and perceived speed), resilience, error handling, logging, alerting, tracing and APM, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, legal (including whether the privacy policy, terms, and public claims are still true), docs, consistency, admin panel coverage, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
+description: Full product and code audit of uncommitted changes, the latest PR, a branch, a path, or the whole repo. Covers security (OWASP, PCI, dependency versions), performance (real and perceived speed), resilience, error handling, logging, alerting, tracing and APM, analytics, accessibility, UI/UX (eye flow, CTAs, light and dark mode, mobile), best practices, tests, simplicity, innovation, AI cost, code quality, leftovers from earlier attempts, legal (including whether the privacy policy, terms, and public claims are still true), docs, consistency, admin panel coverage, and customer persona reviews. Use whenever the user says audit, "/audit", "check everything", "is this ready to ship", "pre-release review", or asks to review changes across several of these areas, even if they don't say "audit". For a bug hunt alone use /code-review; for a security check alone use /security-review.
 argument-hint: "[auto|uncommitted|pr [n]|branch|last [n]|all|<range>|<path>] [lens or bundle,...] [--quick] [--fix]"
 allowed-tools:
   - Bash(${CLAUDE_SKILL_DIR}/scripts/scope.sh *)
@@ -41,12 +41,13 @@ Check a set of changes against every lens in the table below, then report only v
 | 3 | `tests` | Unit, integration, performance tests | same |
 | 4 | `practices` | Framework-recommended approach, build vs. buy | `references/4-engineering.md` |
 | 4 | `quality` | Concise, not duplicated, current conventions, file structure and size | same |
+| 4 | `leftovers` | Remains of earlier attempts, references to what never shipped, repetitive or unnecessary code and UI | same |
 | 4 | `cost` | Deterministic first, AI as fallback, spend limits | same |
 | 4 | `delivery` | Rollout, rollback, compatibility, config, CI | same |
 | 5 | `a11y` | WCAG AA minimum, AAA when low-hanging fruit | `references/5-experience.md` |
 | 5 | `simplicity` | Plain words, fast setup, progressive depth | same |
 | 5 | `consistency` | Verbiage, design, architecture, ideals | same |
-| 5 | `docs` | README, markdown, help center, blog, changelog | same |
+| 5 | `docs` | README, markdown, help center, blog, changelog, and whether each public changelog fits its audience | same |
 | 5 | `ux` | Attention, CTAs, light and dark mode, mobile, UI states, i18n, SEO | same |
 | 6 | `personas` | Walkthroughs as each customer type | `references/6-product.md` |
 | 6 | `admin` | Customer changes can be seen and handled from the admin panel, here or in another project | same |
@@ -62,7 +63,7 @@ A bundle is a shortcut for one group's lenses. Bundles and lenses can be combine
 | `protect` | `security`, `legal` |
 | `reliability` | `performance`, `resilience`, `errors`, `data` |
 | `observability` | `logging`, `alerting`, `tracing`, `analytics`, `tests` |
-| `engineering` | `practices`, `quality`, `cost`, `delivery` |
+| `engineering` | `practices`, `quality`, `leftovers`, `cost`, `delivery` |
 | `experience` | `a11y`, `simplicity`, `consistency`, `docs`, `ux` |
 | `product` | `personas`, `admin`, `plans`, `innovation` |
 

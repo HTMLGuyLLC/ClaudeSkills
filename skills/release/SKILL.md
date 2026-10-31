@@ -65,7 +65,7 @@ From these, work out the merge method, how versions are bumped, what triggers a 
 Skip what's already done.
 
 1. On the default branch, create a branch using the repo's naming style.
-2. Follow project rules that apply before a PR, such as adding a changelog line.
+2. Follow project rules that apply before a PR, such as adding a changelog line. A public changelog only gets what its readers can see or experience, so leave out internal work and anything meant for a different audience.
 3. Run the lint and tests covering the change, in one message if they can run side by side. If the project has no CI, run the full suite, because nothing else will. Fixing a failure here is much cheaper than a CI round.
 4. Stage only the files belonging to this work, and commit with an explicit pathspec. Confirm with `git diff --cached --stat` first.
 5. Push the branch.

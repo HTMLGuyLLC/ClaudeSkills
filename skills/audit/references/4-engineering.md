@@ -1,4 +1,4 @@
-# Group 4: Practices, quality, cost, delivery
+# Group 4: Practices, quality, leftovers, cost, delivery
 
 ## practices
 
@@ -35,6 +35,32 @@ A finding must name the harm this structure would prevent:
 - The logic can't be reused without copying it.
 
 **Don't flag:** a small helper used once that reads better beside its caller, splitting that makes readers jump between files to follow one idea, a wrapper or abstraction with nothing behind it, layouts the framework requires, or generated code. On a diff, flag only what the change added or made worse, and don't ask for a whole file to be refactored because of a small edit.
+
+## leftovers
+
+`quality` judges how the code is written. This lens asks whether something should exist at all. AI work often goes through several attempts, and pieces of the early ones stay behind. They look deliberate, so the next reader, human or AI, trusts them and builds on them.
+
+**Compare the attempts with production.** Read the commits since the base branch (`git log -p <base>..HEAD` where a base exists), and look for what was added early and later abandoned. The test for each suspect is whether it ever reached production. Check the base branch, release tags, and applied migrations. On `all`, compare against the latest release instead.
+
+**Left over from earlier attempts**
+- Code that handles something that never shipped: a compatibility shim, fallback, migration path, or "old format" branch for a name, column, or API that only ever existed on this branch.
+- A migration that adds something a later unmerged migration removes. These can be collapsed before merge.
+- Comments, docs, tests, or logs that mention an abandoned approach, such as "no longer uses X", "the new version", or "instead of the old Y". Readers may go looking for something that never existed.
+- Temporary names that stuck, like `v2`, `new`, `final`, or `temp`, when nothing else exists to compare them with.
+- Feature flags, settings, env vars, and packages added for an abandoned approach.
+- Tests that only prove code that's now unused, mocks of removed things, and one-off scripts, debug pages, sample data, plans, and scratch files.
+
+**Repetitive or unnecessary**
+- Two ways of doing the same job, where the second was added without removing the first.
+- Checks repeated at several layers with no extra protection, and fallbacks for cases that can't happen.
+- Settings, options, or parameters with only one value ever used.
+- For users: the same message, label, or explanation shown repeatedly on one screen, UI that restates what's already obvious, and steps, confirmations, or fields that add nothing.
+
+**Severity:** Medium when it could mislead someone, such as anything that refers to something that never existed. Low when it's only clutter. A finding says what the item is, why it's safe to remove, and how you know it never shipped or isn't used.
+
+**When fixing:** search for every reference before deleting, including strings, config, and dynamic lookups. Leave anything you can't prove is unused as a finding for a person.
+
+**Don't flag:** compatibility for anything that really shipped, including data, clients, or API users still on the old form. Also leave repetition that's deliberate, such as a CTA repeated on a long page, defense in depth at a real trust boundary, or history that's meant to be history, such as a changelog or decision record.
 
 ## cost
 

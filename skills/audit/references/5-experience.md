@@ -63,6 +63,19 @@ Search for everything the change makes stale, then check each one.
 
 If these live outside the repo, list what needs updating and mark it Not verified. A shipped feature with no customer-facing announcement is worth an Idea-level note.
 
+**Changelogs and What's new**
+
+Each public changelog, What's new panel, or release note has an audience. Work out who can see it, then check every entry from that reader's side.
+
+- **Right audience:** an entry appears only where the people reading it are affected. Marketing site updates and admin panel changes don't belong in a changelog that normal customers see. Admin changes go somewhere only staff can see, and changes limited to one plan or role show only to those users where the changelog can target them.
+- **Something they can see or experience:** a new feature, a visible change, a fixed problem they could have hit, or a real change in speed or reliability. Refactors, moved files, renamed functions, dependency bumps, test changes, and internal tooling stay out.
+- **Described as the result:** behind-the-scenes work that users really feel is written as what they notice, like "Reports load twice as fast", not how it was done.
+- **Actually available:** nothing unreleased, reverted, or hidden behind a flag for this audience. An entry doesn't mention anything that never reached them.
+- **Plain and safe:** no internal names, ticket numbers, or commit hashes, and no security details that help an attacker. Say what to do if users must act.
+- **Generated changelogs:** if entries come from commits or PR titles, flag the process as well as the entries, so the same leak doesn't return.
+
+**Don't flag:** a developer changelog whose readers use the code or API, such as a library's `CHANGELOG.md`. Internal changes that affect those readers belong there.
+
 ## ux
 
 **Attention and eye flow**

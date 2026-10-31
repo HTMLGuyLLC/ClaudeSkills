@@ -29,7 +29,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | `/audit src/checkout` | One folder |
 | `/audit all` | The whole repo |
 
-**Choose which topics to check.** It runs all 24 unless you pick some. The list below shows what each one covers.
+**Choose which topics to check.** It runs all 25 unless you pick some. The list below shows what each one covers.
 
 | Command | What it runs |
 |---|---|
@@ -224,6 +224,18 @@ Local or low-stakes tools don't need all of this. Whether data really arrives ne
 </details>
 
 <details>
+<summary><code>leftovers</code>: Is anything here left over or just not needed?</summary>
+
+- **Earlier attempts:** it reads the branch's commits for things added early and later abandoned, then checks whether they ever reached production.
+- **Things that never shipped:** shims, fallbacks, and comments that mention a name, column, or approach that only existed during the work. These can send the next reader looking for something that was never there.
+- **Stale extras:** temporary `v2` or `new` names, unused flags, settings, and packages, and leftover scripts, sample data, and tests.
+- **Repetition:** two ways of doing one job, repeated checks, and options with only one value.
+- **For users:** repeated messages, UI that restates the obvious, and steps that add nothing.
+- **Safe removal:** it searches for every reference first, and leaves anything it can't prove is unused for you to decide.
+
+</details>
+
+<details>
 <summary><code>cost</code>: Are you paying more than you need to, especially for AI?</summary>
 
 - **AI as a fallback:** whether a rule, lookup, or query could do the job, fully or for the common cases.
@@ -292,6 +304,7 @@ Contrast and focus order need a running app to confirm.
 - **Developer docs:** API docs, SDK examples, and settings references.
 - **Marketing:** the blog, feature lists, pricing, and emails.
 - **Outside the repo:** anything it can't reach is listed for you to update.
+- **Changelogs:** each public changelog or What's new shows only what its readers can see or experience. Admin and marketing site updates stay out of customer changelogs, and so do refactors and other behind-the-scenes work. Developer changelogs for libraries and APIs are exempt.
 
 </details>
 
@@ -421,7 +434,7 @@ These debates are simulated by AI from your project's files. They help you think
 
 ### `/release`
 
-**What it does:** Ships your work from start to finish. It commits, opens a PR, waits for tests and reviews, fixes what comes back, merges, and runs your project's release process. If it gets stuck or stops partway, run it again and it picks up where it left off. When CI fails or reviews come back, it gathers everything at once and fixes it all in one push, because every push restarts CI.
+**What it does:** Ships your work from start to finish. It commits, opens a PR, waits for tests and reviews, fixes what comes back, merges, and runs your project's release process. If it gets stuck or stops partway, run it again and it picks up where it left off. When CI fails or reviews come back, it gathers everything at once and fixes it all in one push, because every push restarts CI. If your project has a public changelog, it adds only what those readers can see or experience.
 
 **Ship it:**
 
