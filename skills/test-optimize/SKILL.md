@@ -18,7 +18,7 @@ With no target, use the whole repo's unit tests. In a monorepo, measure each pac
 - **Protection is the hard limit. Speed is the goal inside it.** After every change, all three hold, or the change is reverted:
   1. Every test case from the baseline still runs, under the same name or one mapped to it.
   2. Every test that passed still passes.
-  3. No file's covered lines, branches, functions, or statements go down.
+  3. No file has more lines, branches, functions, or statements left unrun, or any such loss is proven a coverage miscount (Step 4).
 - **Never weaken a test to speed it up.** No skipping, deleting assertions, loosening matchers, lowering timeouts until something stops failing, or mocking out the code the test exists to check. A mocked dependency must be one the test doesn't exercise.
 - **Remove a test only when another test checks the same behavior with the same inputs.** Write each removal into `allow.txt` as `<test id> => <the test that covers it now>`. Show the user every line of it before committing.
 - **Change one kind of thing at a time** and measure it alone. Keep it only if it saves more time than the run-to-run noise.
@@ -57,7 +57,9 @@ Note the machine's core count and whether a CI config runs the same command. A c
 
 ## Step 2: Measure the baseline
 
-Run the full unit suite twice with a machine-readable reporter, then once with coverage. Record wall time for each. The gap between the two plain runs is the noise. A change has to beat it to count.
+Run the full unit suite once to warm the runner's caches and throw that run away. A first run in a fresh checkout or worktree can take half again as long. Then run it twice with a machine-readable reporter, and once with coverage. Wrap each run in `/usr/bin/time -p` (or `time`) and record wall time and CPU time (user + sys). The gap between the two plain runs is the noise. A change has to beat it to count.
+
+Check the machine's load (`uptime`) before trusting wall time. When other work is running, wall time swings a lot between runs while CPU time stays steady, so judge changes on CPU time and report both. Run nothing else heavy yourself while a measured run is going, and never edit files the suite reads during a measured run.
 
 Run `report.mjs summary` on the first report. Also read the runner's own time split (Vitest prints transform, setup, collect, tests, and environment), which shows whether time goes to running tests or to loading files.
 
@@ -82,9 +84,10 @@ For each candidate, biggest saving first:
 2. Run the affected test files first. Fix or revert before going wider.
 3. Run the full suite with the reporter. Then run `report.mjs diff baseline-1.json <new> --allow allow.txt`.
 4. For any change that touches test code or mocks, also run coverage and `report.mjs coverage`. Config-only changes (pool, workers, environment) still need one coverage check before the final commit.
-5. For isolation or shared-setup changes, run the affected files three times in shuffled order. Any flake means revert.
-6. Keep it only if protection is kept and the time saved beats the noise. Otherwise revert it. Either way, add a ledger line.
-7. Commit kept changes one at a time, with the measured saving in the message.
+5. When `coverage` reports a loss, check it before reverting. Coverage tools can miscount when the same source file loads under two environments or transforms in one run, and show hits on code no test reaches or zero on code a passing test clearly runs. For each lost line or branch, break it on purpose (flip the condition, return early), and run the full suite under the old config and the new one. If both catch it, or both miss it, no protection was lost; note a both-miss gap in the report as already there. If only the old config catches it, revert or fix.
+6. For isolation or shared-setup changes, run the affected files three times in shuffled order. Any flake means revert.
+7. Keep it only if protection is kept and the time saved beats the noise. Otherwise revert it. Either way, add a ledger line.
+8. Commit kept changes one at a time, with the measured saving in the message.
 
 Stop when the remaining candidates are each worth less than the noise, or are risky changes that need the user's call.
 

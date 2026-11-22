@@ -545,8 +545,11 @@ cov "$t/cov-b.json" 8 80
 expect "same coverage kept" "protection: kept" "$(cd "$t" && node "$report" coverage cov-a.json cov-b.json 2>&1)"
 cov "$t/cov-c.json" 7 70
 out=$(cd "$t" && node "$report" coverage cov-a.json cov-c.json 2>&1); code=$?
-expect "coverage drop caught" "src/x.ts: lines covered 8 -> 7" "$out"
+expect "coverage drop caught" "src/x.ts: lines not run 2 -> 3" "$out"
 [ "$code" = 1 ] && pass || fail "coverage drop should exit 1"
+printf '{"total":{"lines":{"total":9,"covered":9,"pct":100}},"%s/src/x.ts":{"lines":{"total":9,"covered":9,"pct":100}}}' "$t" > "$t/cov-d.json"
+printf '{"total":{"lines":{"total":10,"covered":10,"pct":100}},"%s/src/x.ts":{"lines":{"total":10,"covered":10,"pct":100}}}' "$t" > "$t/cov-e.json"
+expect "uncounted import line isn't a loss" "protection: kept" "$(cd "$t" && node "$report" coverage cov-e.json cov-d.json 2>&1)"
 out=$(cd "$t" && node "$report" summary nope.json 2>&1); code=$?
 expect "missing report errors" "can't read nope.json" "$out"
 [ "$code" = 2 ] && pass || fail "missing report should exit 2"

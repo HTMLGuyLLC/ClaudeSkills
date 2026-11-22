@@ -6,7 +6,8 @@ How to get a report, where time usually hides, and the usual fixes, per runner. 
 
 - **Report:** `vitest run --reporter=default --reporter=json --outputFile.json=<file>`. The default reporter's last lines split the time into transform, setup, collect, tests, environment, and prepare. Keep that log.
 - **Coverage:** `vitest run --coverage --coverage.reporter=json-summary --coverage.reportsDirectory=<dir>` writes `<dir>/coverage-summary.json`.
-- **Reading the split:** these are summed across workers, so they can exceed wall time. When environment, setup, and collect together dwarf tests, the cost is per file, not in the tests.
+- **Reading the split:** these are summed across workers, so they can exceed wall time. When environment, setup, and import (collect) together dwarf tests, the cost is per file, not in the tests. Vitest's JSON report times only test bodies, so `report.mjs summary` can't see this cost. Use the split.
+- **Slow imports:** Vitest 4.1 and later can list them with `--experimental.importDurations.print=true --experimental.importDurations.limit=30`.
 - **Environment:** jsdom or happy-dom costs on every file that loads it. Make `node` the default and give DOM files their own project or a `// @vitest-environment jsdom` comment. Find candidates by grepping test files for `render(`, `screen.`, `document`, `window`, and `@testing-library`.
 - **Setup files:** they run once per test file. Anything heavy they import is paid by every file. Keep DOM-only setup in the DOM project.
 - **Imports:** a test that imports a barrel (`index.ts` re-exporting a lot, icon sets, a whole UI kit) pays to load all of it. Import the module itself, or mock the heavy dependency when the test doesn't exercise it.

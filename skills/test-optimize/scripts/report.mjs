@@ -116,7 +116,9 @@ function summary(file) {
   console.log(`file_time_total: ${secs(fileMs)}`)
   console.log(`test_body_time_total: ${secs(testMs)}`)
   // Per-file time the test bodies don't explain is load, setup and environment cost.
-  console.log(`overhead_time_total: ${secs(Math.max(0, fileMs - testMs))}`)
+  const overhead = Math.max(0, fileMs - testMs)
+  const untimed = fileMs > 0 && overhead < fileMs * 0.01
+  console.log(`overhead_time_total: ${secs(overhead)}${untimed ? ' (this report seems to time only test bodies; use the runner\'s own time split for load cost)' : ''}`)
 
   console.log(`\nslowest_files (total / in tests / tests):`)
   for (const f of [...r.files].sort((a, b) => b.ms - a.ms).slice(0, top)) {
@@ -218,9 +220,12 @@ function coverage(beforeFile, afterFile) {
     }
     for (const k of kinds) {
       if (!b[k] || !a[k]) continue
-      // Covered count catches lost coverage even when the total moved too.
-      if (a[k].covered < b[k].covered) drops.push(`${file}: ${k} covered ${b[k].covered} -> ${a[k].covered}`)
-      else if (a[k].pct < b[k].pct && a[k].total === b[k].total) drops.push(`${file}: ${k} ${b[k].pct}% -> ${a[k].pct}%`)
+      // Compare what's left unrun. A different transform can count an import
+      // line as a statement in one run and not the other, which moves the
+      // covered count and the total together without losing any testing.
+      const missedBefore = b[k].total - b[k].covered
+      const missedAfter = a[k].total - a[k].covered
+      if (missedAfter > missedBefore) drops.push(`${file}: ${k} not run ${missedBefore} -> ${missedAfter} (covered ${b[k].covered}/${b[k].total} -> ${a[k].covered}/${a[k].total})`)
     }
   }
   for (const k of kinds) {

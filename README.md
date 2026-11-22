@@ -662,7 +662,7 @@ Commits that only a detached worktree holds are saved to a `rescue/` branch befo
 /test-optimize --plan
 ```
 
-It works on a branch in its own worktree and commits each kept change on its own with the time it saved. If it merges duplicate tests, it lists each one it replaced and which test covers it now. It finishes with before and after times, and the riskier options it left for you to decide. Its reports read Jest and Vitest JSON, and JUnit XML, which pytest, Go, PHPUnit, and most other runners can write. It needs Node.js.
+It judges speed on CPU time as well as wall time, since other work on your machine makes wall time jump around. When the coverage numbers look wrong, it breaks the code on purpose to check that a test still catches it. It works on a branch in its own worktree and commits each kept change on its own with the time it saved. If it merges duplicate tests, it lists each one it replaced and which test covers it now. It finishes with before and after times, and the riskier options it left for you to decide. Its reports read Jest and Vitest JSON, and JUnit XML, which pytest, Go, PHPUnit, and most other runners can write. It needs Node.js.
 
 ## Install
 
