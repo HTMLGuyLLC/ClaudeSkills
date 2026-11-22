@@ -13,6 +13,7 @@ How to get a report, where time usually hides, and the usual fixes, per runner. 
 - **Imports:** a test that imports a barrel (`index.ts` re-exporting a lot, icon sets, a whole UI kit) pays to load all of it. Import the module itself, or mock the heavy dependency when the test doesn't exercise it.
 - **Pool and isolation:** `threads` usually starts faster than `forks`. `isolate: false` reuses module state across files and can be much faster, but only for files that don't mutate globals, module state, or mocks. Put those files in their own project and run them several times in shuffled order (`--sequence.shuffle`) before trusting it.
 - **Waiting:** real `setTimeout`, `sleep`, polling, retries, and long `waitFor` timeouts. Use fake timers (`vi.useFakeTimers()`, `vi.advanceTimersByTime`) and `userEvent.setup({ advanceTimers: vi.advanceTimersByTime })`.
+- **`vi.waitFor` under fake timers still waits in real time.** Each check advances the fake clock by `interval` (50ms) and also sleeps 50ms for real, so waiting out a 400ms debounce still takes about 400ms. Advance past the delay first with `await vi.advanceTimersByTimeAsync(ms)`, then `vi.waitFor`. Shrink its `timeout` so the total fake time it allows matches what the test allowed before.
 - **Typecheck:** keep `typecheck` out of the unit run. The type checker runs elsewhere.
 
 ## Jest
