@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Offline tests for the bundled scripts. Needs only git and jq.
+# Offline tests for the bundled scripts. Needs only git, jq, and node.
 # Usage: tests/run.sh
 set -uo pipefail
 
@@ -501,6 +501,56 @@ out=$(cd "$work" && HOME="$ch" bash "$cleanup_scan" --no-gh "$good" "$bad" 2>&1)
 expect "fetch result matches its repo" "$(printf 'repo: %s\nbase: origin/main\nfetch: ok' "$good")" "$out"
 expect "failed fetch matches its repo" "$(printf 'repo: %s\nbase: main\nfetch: failed' "$bad")" "$out"
 
+# --- test-optimize: reports must notice lost tests and lost coverage
+report="$repo/skills/test-optimize/scripts/report.mjs"
+t="$work/to"
+mkdir -p "$t"
+jest_report() { # <file> <second test title> <second status> [third title]
+  local third=''
+  [ -n "${4:-}" ] && third=",{\"fullName\":\"$4\",\"status\":\"passed\",\"duration\":5}"
+  printf '{"testResults":[{"name":"%s/a.test.ts","startTime":0,"endTime":3000,"assertionResults":[{"fullName":"adds","status":"passed","duration":2500},{"fullName":"%s","status":"%s","duration":10}%s]},{"name":"%s/b.test.ts","startTime":0,"endTime":400,"assertionResults":[{"fullName":"adds","status":"passed","duration":1}]}]}' \
+    "$t" "$2" "$3" "$third" "$t" > "$1"
+}
+jest_report "$t/before.json" subtracts passed
+out=$(cd "$t" && node "$report" summary before.json 2>&1)
+expect "summary counts tests" "tests: 3 (passed 3" "$out"
+expect "summary lists slowest file" "3.0s / 2.5s / 2  a.test.ts" "$out"
+expect "summary finds repeated titles" "2x  adds" "$out"
+expect "summary shows overhead" "overhead_time_total: 0.9s" "$out"
+jest_report "$t/same.json" subtracts passed
+out=$(cd "$t" && node "$report" diff before.json same.json 2>&1); code=$?
+expect "unchanged keeps protection" "protection: kept" "$out"
+[ "$code" = 0 ] && pass || fail "unchanged diff should exit 0"
+jest_report "$t/gone.json" divides passed
+out=$(cd "$t" && node "$report" diff before.json gone.json 2>&1); code=$?
+expect "missing test caught" "a.test.ts > subtracts" "$out"
+expect "missing test loses protection" "protection: LOST" "$out"
+[ "$code" = 1 ] && pass || fail "missing test should exit 1"
+printf 'subtracts => a.test.ts > divides covers the same inputs\n' > "$t/allow.txt"
+out=$(cd "$t" && node "$report" diff before.json gone.json --allow allow.txt 2>&1)
+expect "allowed replacement passes" "protection: kept" "$out"
+expect "replacement listed" "covers the same inputs" "$out"
+jest_report "$t/failing.json" subtracts failed
+expect "newly failing caught" "no_longer_passing: 1" "$(cd "$t" && node "$report" diff before.json failing.json 2>&1)"
+printf '<testsuites><testsuite><testcase classname="%s/c.test.ts" name="adds" time="0.1"/><testcase classname="%s/c.test.ts" name="subtracts" time="0.2"></testcase></testsuite></testsuites>' "$t" "$t" > "$t/moved.xml"
+printf '{"testResults":[{"name":"%s/a.test.ts","assertionResults":[{"fullName":"adds","status":"passed"},{"fullName":"subtracts","status":"passed"}]}]}' "$t" > "$t/two.json"
+out=$(cd "$t" && node "$report" diff two.json moved.xml 2>&1)
+expect "moved tests kept" "protection: kept" "$out"
+expect "moves listed" "a.test.ts > subtracts  ->  c.test.ts > subtracts" "$out"
+printf '<testsuite><testcase name="x" classname="k"><skipped/></testcase><testcase name="y" classname="k"><failure>no</failure></testcase></testsuite>' > "$t/j.xml"
+expect "junit statuses" "passed 0, failed 1, skipped 1" "$(cd "$t" && node "$report" summary j.xml 2>&1)"
+cov() { printf '{"total":{"lines":{"total":10,"covered":%s,"pct":%s}},"%s/src/x.ts":{"lines":{"total":10,"covered":%s,"pct":%s}}}' "$2" "$3" "$t" "$2" "$3" > "$1"; }
+cov "$t/cov-a.json" 8 80
+cov "$t/cov-b.json" 8 80
+expect "same coverage kept" "protection: kept" "$(cd "$t" && node "$report" coverage cov-a.json cov-b.json 2>&1)"
+cov "$t/cov-c.json" 7 70
+out=$(cd "$t" && node "$report" coverage cov-a.json cov-c.json 2>&1); code=$?
+expect "coverage drop caught" "src/x.ts: lines covered 8 -> 7" "$out"
+[ "$code" = 1 ] && pass || fail "coverage drop should exit 1"
+out=$(cd "$t" && node "$report" summary nope.json 2>&1); code=$?
+expect "missing report errors" "can't read nope.json" "$out"
+[ "$code" = 2 ] && pass || fail "missing report should exit 2"
+
 # --- install
 home="$work/home"
 mkdir -p "$home/.claude/skills"
@@ -527,7 +577,7 @@ for skill in "$repo"/skills/*/; do
   done < <(grep -oE '\$\{CLAUDE_SKILL_DIR\}/(scripts|references)/[A-Za-z0-9._-]+' "$skill/SKILL.md" | sed 's/.*}\///' | sort -u)
 done
 
-for skill in release loop-audit improve-deterministic cleanup; do
+for skill in release loop-audit improve-deterministic cleanup test-optimize; do
   grep -q '^disable-model-invocation: true$' "$repo/skills/$skill/SKILL.md" && pass || fail "$skill: must be typed to run"
 done
 grep -q '^disable-model-invocation:' "$repo/skills/personas/SKILL.md" && fail "personas: audit must be able to invoke it" || pass

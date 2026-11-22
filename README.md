@@ -12,6 +12,7 @@ Use them or fork them as you like. This repo doesn't take issues or pull request
 | [`/release`](#release) | Takes finished work all the way from commit to live release |
 | [`/improve-deterministic`](#improve-deterministic) | Makes your rules-based logic more accurate, without AI in the final product |
 | [`/cleanup`](#cleanup) | Clears out finished worktrees and branches, and asks before touching unfinished work |
+| [`/test-optimize`](#test-optimize) | Makes your unit tests run faster without letting any of them catch less |
 
 ## How to use each skill
 
@@ -639,9 +640,33 @@ Its data stays in a `.improve/` folder that git ignores. That folder may hold pr
 
 Commits that only a detached worktree holds are saved to a `rescue/` branch before it's removed. If you remove unfinished work and keep it, the branch stays and uncommitted changes go to a stash. It never deletes remote branches or chat history. Full detection needs the Claude desktop app on a Mac, and it works from `git` alone elsewhere. If `lsof` is missing, it can't see running processes, so it asks before removing anything.
 
+### `/test-optimize`
+
+**What it does:** Finds out where your unit tests spend their time, then speeds them up: runner settings, slow tests that wait on real timers, tests that repeat each other, and many tiny files that each pay the same startup cost. It tries one change at a time and keeps it only if the suite is measurably faster and nothing was lost. Every test still runs and still passes, and no file's coverage goes down. If a change fails that check, it's undone.
+
+**Speed up the whole repo's unit tests:**
+
+```text
+/test-optimize
+```
+
+**Speed up one package or folder:**
+
+```text
+/test-optimize packages/web
+```
+
+**See the plan and the expected savings, without changing anything:**
+
+```text
+/test-optimize --plan
+```
+
+It works on a branch in its own worktree and commits each kept change on its own with the time it saved. If it merges duplicate tests, it lists each one it replaced and which test covers it now. It finishes with before and after times, and the riskier options it left for you to decide. Its reports read Jest and Vitest JSON, and JUnit XML, which pytest, Go, PHPUnit, and most other runners can write. It needs Node.js.
+
 ## Install
 
-You need [Claude Code](https://claude.com/claude-code) and `git`. `/cleanup` also needs `jq`. Download the repo, or your own fork of it:
+You need [Claude Code](https://claude.com/claude-code) and `git`. `/cleanup` also needs `jq`, and `/test-optimize` needs Node.js. Download the repo, or your own fork of it:
 
 ```bash
 git clone https://github.com/HTMLGuyLLC/ClaudeSkills.git ~/ClaudeSkills
@@ -692,7 +717,7 @@ To remove a skill, delete its folder here and its link in `~/.claude/skills/`.
 
 ## Tests
 
-`tests/run.sh` checks the scripts offline, using a stub `gh`, temporary repos, and a temporary `HOME`. It needs only `git` and `jq`, and CI runs it on every push.
+`tests/run.sh` checks the scripts offline, using a stub `gh`, temporary repos, and a temporary `HOME`. It needs only `git`, `jq`, and Node.js, and CI runs it on every push.
 
 ## License
 
