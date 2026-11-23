@@ -69,8 +69,12 @@ Work through these in order. The early ones usually pay most and touch the fewes
 
 1. **Per-file overhead.** When load, setup, and environment time dwarfs test time, look at config before any test: test environment applied to files that don't need it, heavy setup files, slow transforms, isolation settings, pool, worker count. One config change can cut every file at once.
 2. **Slow files and tests.** The top of `slowest_files` and `slowest_tests`. Look for real waits (`sleep`, `setTimeout`, polling, retries), real network or disk, expensive setup repeated per test that could be built once without sharing mutable state, and imports of large modules the test doesn't use.
-3. **Duplicated tests.** Grep for the same function called with the same inputs in several tests or files. `same_title_in_several_files` gives leads. Merge exact duplicates. Turn near-identical tests into one table-driven test (`it.each`, `pytest.mark.parametrize`, Go table tests) that keeps one named case per original, so the names still match in `diff`.
-4. **Scattered files.** Many tiny files for one module, each paying its own per-file overhead. Merge them into one file per module when the per-file cost is large. Keep the original `describe` names so test ids stay readable.
+3. **Duplicated tests.** Grep for the same function called with the same inputs in several tests or files. `same_title_in_several_files` gives leads. Merge exact duplicates. Turn near-identical tests into one table-driven test (`it.each`, `pytest.mark.parametrize`, Go table tests) that keeps one named case per original, so the names still match in `diff`. Removing a test saves only its own run time, usually milliseconds, so do this for clarity, never as the main speed lever.
+4. **Scattered files.** Many tiny files for one module, each paying its own per-file overhead. Keep the original `describe` names so test ids stay readable. Before merging, estimate whether it pays (below).
+
+**What one test file costs.** Isolation is paid per file, not per test. From the runner's own time split, per-file cost is (setup + environment + import) ÷ file count. Merging two files saves their shared setup and environment in full, and only the part of the import cost the two files share, which is most of it when both test the same module. Divide the CPU saved by the worker count for a rough wall-time saving. When the estimate across every merge candidate is under about 5% of the suite's CPU time, list scattered files as considered and skipped rather than merging them all: the churn, harder-to-find tests, and merge conflicts cost more than the time saved.
+
+**Try a merge before doing it widely.** Pick one folder with several small files that test related code. Time just those files three times, merge them, and time them three times again, comparing CPU time. Check protection with `report.mjs diff`, where merged tests should show as moved. Scale the measured saving per merged file up to all the candidates, and merge more only if the projected saving beats the noise and the user agrees.
 
 For each candidate, write down the expected saving (seconds), the files it touches, and the risk. Present this as a table, biggest saving first.
 
@@ -101,6 +105,7 @@ Report to the user:
 - **Protection:** test count before and after, `protection: kept` from both checks, and every `allow.txt` line in full.
 - **Kept changes:** one line each, with the seconds it saved.
 - **Reverted:** one line each, with why.
+- **Considered and skipped:** every Step 3 kind you didn't act on, with the estimated saving and why it wasn't worth it, so a skipped step never looks like a missed one.
 - **Not done, needs a decision:** risky options with their expected saving and risk, such as turning off isolation broadly or sharding in CI.
 - **Already failing:** tests that failed at baseline.
 
